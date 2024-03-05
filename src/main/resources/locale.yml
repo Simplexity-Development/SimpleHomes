@@ -1,0 +1,8 @@
+errors:
+  must-be-player: "<red>Sorry, only a player can run that command!</red>"
+  provide-home-name: "<gray>Please provide a home name</gray>"
+  home-already-exists: "<red>Sorry, you already have a home with that name!</red> <gray>Use <yellow>/sethome <name> -o</yellow> to overwrite a home</gray>"
+  home-not-found: "<red>Home not found</red>"
+messages:
+  home-set: "<green>Home <name> has been set</green>"
+  home-deleted: "<green>Home <name> has been deleted</gray>"

@@ -1,0 +1,15 @@
+name: SimpleHomes
+version: '${project.version}'
+main: simplexity.simplehomes.SimpleHomes
+api-version: '1.20'
+commands:
+  sethome:
+    permission: homes.sethome
+    description: Sets a home
+permissions:
+  homes:
+    default: op
+    description: allows base plugin functionality
+  homes.sethome:
+    default: op
+    description: allows player to set home
