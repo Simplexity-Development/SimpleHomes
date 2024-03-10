@@ -6,6 +6,9 @@ commands:
   sethome:
     permission: homes.sethome
     description: Sets a home
+  delhome:
+    permission: homes.delhome
+    description: Deletes a home
 permissions:
   homes:
     default: op
@@ -13,3 +16,6 @@ permissions:
   homes.sethome:
     default: op
     description: allows player to set home
+  homes.delhome:
+    default: op
+    description: allows player to delete home

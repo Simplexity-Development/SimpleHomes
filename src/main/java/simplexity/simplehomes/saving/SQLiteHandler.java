@@ -13,7 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 public class SQLiteHandler extends SaveHandler {
@@ -34,8 +36,10 @@ public class SQLiteHandler extends SaveHandler {
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS homes (
-                        player_uuid VARCHAR(36) PRIMARY KEY,
+                        player_uuid_and_name VARCHAR (255) PRIMARY KEY,
+                        player_uuid VARCHAR(36),
                         home_name VARCHAR(255),
+                        world_uuid VARCHAR(255),
                         world_name VARCHAR(255),
                         location_x INT,
                         location_y INT,
@@ -46,6 +50,7 @@ public class SQLiteHandler extends SaveHandler {
         } catch (SQLException e) {
             logger.severe("Failed to connect to SQLite database");
             logger.severe("Error: " + e.getMessage());
+            logger.severe(Arrays.toString(e.getStackTrace()));
         }
     }
     
@@ -61,7 +66,7 @@ public class SQLiteHandler extends SaveHandler {
                         homes.add(new Home(
                                 resultSet.getString("home_name"),
                                 new Location(
-                                        SimpleHomes.getInstance().getServer().getWorld(resultSet.getString("world_name")),
+                                        SimpleHomes.getInstance().getServer().getWorld(resultSet.getString("world_uuid")),
                                         resultSet.getInt("location_x"),
                                         resultSet.getInt("location_y"),
                                         resultSet.getInt("location_z")
@@ -85,16 +90,18 @@ public class SQLiteHandler extends SaveHandler {
     public Home getHome(OfflinePlayer player, String homeName) {
         try {
             // Prepare the SQL statement to check if the home exists
-            String checkIfExistsQuery = "SELECT COUNT(*) AS count FROM homes WHERE player_uuid = ? AND home_name = ?";
+            String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
             try (PreparedStatement homeExists = connection.prepareStatement(checkIfExistsQuery)) {
                 homeExists.setString(1, player.getUniqueId().toString());
                 homeExists.setString(2, homeName);
                 try (ResultSet resultSet = homeExists.executeQuery()) {
-                    if (resultSet.getInt("count") > 0) {
+                    if (resultSet != null) {
+                        String worldUUIDString = resultSet.getString("world_uuid");
+                        UUID worldUUID = UUID.fromString(worldUUIDString);
                         return new Home(
                                 resultSet.getString("home_name"),
                                 new Location(
-                                        SimpleHomes.getInstance().getServer().getWorld(resultSet.getString("world_name")),
+                                        SimpleHomes.getInstance().getServer().getWorld(worldUUID),
                                         resultSet.getInt("location_x"),
                                         resultSet.getInt("location_y"),
                                         resultSet.getInt("location_z")
@@ -118,12 +125,12 @@ public class SQLiteHandler extends SaveHandler {
     public boolean deleteHome(OfflinePlayer player, String homeName) {
         try {
             // Prepare the SQL statement to check if the home exists
-            String checkIfExistsQuery = "SELECT COUNT(*) AS count FROM homes WHERE player_uuid = ? AND home_name = ?";
+            String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
             try (PreparedStatement homeExists = connection.prepareStatement(checkIfExistsQuery)) {
                 homeExists.setString(1, player.getUniqueId().toString());
                 homeExists.setString(2, homeName);
                 try (ResultSet resultSet = homeExists.executeQuery()) {
-                    if (resultSet.getInt("count") > 0) { // Home exists
+                    if (resultSet != null) { // Home exists
                         String deleteQuery = "DELETE FROM homes WHERE player_uuid = ? AND home_name = ?";
                         try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
                             deleteStatement.setString(1, player.getUniqueId().toString());
@@ -154,30 +161,23 @@ public class SQLiteHandler extends SaveHandler {
                 
                 try (ResultSet resultSet = homeExists.executeQuery()) {
                     if (resultSet.getInt("count") > 0) { // Home exists
-                        if (overwrite) {
-                            // Delete the existing home
-                            String deleteQuery = "DELETE FROM homes WHERE player_uuid = ? AND home_name = ?";
-                            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
-                                deleteStatement.setString(1, player.getUniqueId().toString());
-                                deleteStatement.setString(2, homeName);
-                                deleteStatement.executeUpdate();
-                            }
-                        } else {
+                        if (!overwrite) {
                             return false; // Don't overwrite, return false
                         }
                     }
                 }
             }
             // Insert the new home
-            String insertQuery = "REPLACE INTO homes (player_uuid, home_name, world_name, location_x, location_y, " +
-                    "location_z) VALUES (?, ?, ?, ?, ?, ?)";
+            String insertQuery = "REPLACE INTO homes (player_uuid_and_name, player_uuid, home_name, world_uuid, location_x, location_y, " +
+                    "location_z) VALUES (?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
-                insertStatement.setString(1, player.getUniqueId().toString());
-                insertStatement.setString(2, homeName);
-                insertStatement.setString(3, location.getWorld().getName());
-                insertStatement.setInt(4, location.getBlockX());
-                insertStatement.setInt(5, location.getBlockY());
-                insertStatement.setInt(6, location.getBlockZ());
+                insertStatement.setString(1, player.getUniqueId() + homeName);
+                insertStatement.setString(2, player.getUniqueId().toString());
+                insertStatement.setString(3, homeName);
+                insertStatement.setString(4, String.valueOf(location.getWorld().getUID()));
+                insertStatement.setInt(5, location.getBlockX());
+                insertStatement.setInt(6, location.getBlockY());
+                insertStatement.setInt(7, location.getBlockZ());
                 insertStatement.executeUpdate();
             }
             return true; // Home set successfully

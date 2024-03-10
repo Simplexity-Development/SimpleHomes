@@ -2,7 +2,7 @@ errors:
   must-be-player: "<red>Sorry, only a player can run that command!</red>"
   provide-home-name: "<gray>Please provide a home name</gray>"
   home-already-exists: "<red>Sorry, you already have a home with that name!</red> <gray>Use <yellow>/sethome <name> -o</yellow> to overwrite a home</gray>"
-  home-not-found: "<red>Home not found</red>"
+  home-not-found: "<red>Home <yellow><name></yellow> not found</red>"
 messages:
   home-set: "<green>Home <name> has been set</green>"
-  home-deleted: "<green>Home <name> has been deleted</gray>"
+  home-deleted: "<gray>Home <yellow><name></yellow> in <yellow><world></yellow> at <yellow><x_loc>x</yellow>, <yellow><y_loc>y</yellow>, <yellow><z_loc>z</yellow> has been deleted</gray>"

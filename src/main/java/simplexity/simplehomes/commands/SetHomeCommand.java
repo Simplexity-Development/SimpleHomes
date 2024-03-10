@@ -45,11 +45,11 @@ public class SetHomeCommand implements TabExecutor {
                 overwrite = true;
             }
         }
-        if (homeExists(playerHomes, homeName) && !overwrite) {
+        if (!SQLiteHandler.getInstance().setHome(player, homeName, playerLocation, overwrite)) {
             player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
             return false;
         }
-        SQLiteHandler.getInstance().setHome(player, homeName, playerLocation, overwrite);
+        
         player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeSet(),
                 Placeholder.unparsed("name", homeName)));
         return true;
