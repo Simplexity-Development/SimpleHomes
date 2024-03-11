@@ -21,7 +21,7 @@ public class SetHomeCommand implements TabExecutor {
     MiniMessage miniMessage = SimpleHomes.getMiniMessage();
     // /sethome name
     /*
-    /sethome - no args, if has no home set, will set first home, if has home, will ask for additional arguments
+    /sethome - no args, if it has no home set, will set first home, if it has home, will ask for additional arguments
     /sethome <name> - check if another home has that name, if it does, return and let player know
     /sethome <name> -o - overwrites the previous home named that if one existed
     each home set checks on how many homes the person has permissions to have, returns if the person has too many
@@ -60,12 +60,4 @@ public class SetHomeCommand implements TabExecutor {
         return List.of("");
     }
     
-    private boolean homeExists(List<Home> homes, String homeName) {
-        for (Home home : homes) {
-            if (home.getName().equalsIgnoreCase(homeName)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

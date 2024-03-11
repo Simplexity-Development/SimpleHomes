@@ -9,6 +9,9 @@ commands:
   delhome:
     permission: homes.delhome
     description: Deletes a home
+  home:
+    permission: homes.teleport
+    description: Teleports to a home
 permissions:
   homes:
     default: op

@@ -17,8 +17,8 @@ public class LocaleHandler {
     private final FileConfiguration localeConfig = new YamlConfiguration();
     private final Logger logger = SimpleHomes.getInstance().getLogger();
     //---------
-    private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound;
-    private String homeSet, homeDeleted;
+    private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome;
+    private String homeSet, homeDeleted, homeTeleported;
     
     private LocaleHandler(){
         if (!localeFile.exists()) {
@@ -46,8 +46,10 @@ public class LocaleHandler {
         provideHomeName = localeConfig.getString("errors.provide-home-name");
         homeAlreadyExists = localeConfig.getString("errors.home-already-exists");
         homeNotFound = localeConfig.getString("errors.home-not-found");
+        nullHome = localeConfig.getString("errors.null-home");
         homeSet = localeConfig.getString("messages.home-set");
         homeDeleted = localeConfig.getString("messages.home-deleted");
+        homeTeleported = localeConfig.getString("messages.home-teleported");
         
     }
     
@@ -64,10 +66,17 @@ public class LocaleHandler {
     public String getHomeExists() {
         return homeAlreadyExists;
     }
+    public String getNullHome() {
+        return nullHome;
+    }
     public String getHomeSet() {
         return homeSet;
     }
     public String getHomeDeleted() {
         return homeDeleted;
+    }
+    
+    public String getHomeTeleported() {
+        return homeTeleported;
     }
 }

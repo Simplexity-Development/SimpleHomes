@@ -24,11 +24,11 @@ public class DelHomeCommand implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
         if (args.length < 1) {
             sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
             return false;
         }
+        List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
         String homeName = args[0];
         if (homeExists(playerHomes, homeName)) {
             Home home = SQLiteHandler.getInstance().getHome(player, homeName);
