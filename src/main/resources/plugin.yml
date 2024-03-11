@@ -25,3 +25,9 @@ permissions:
   homes.teleport:
     default: op
     description: allows player to teleport to home
+  homes.count:
+    default: op
+    description: base for permission on number of homes you can have
+  homes.count.bypass:
+    default: op
+    description: allows for setting infinite homes regardless of how many you have set as the max

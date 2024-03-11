@@ -3,7 +3,8 @@ errors:
   provide-home-name: "<gray>Please provide a home name</gray>"
   home-already-exists: "<red>Sorry, you already have a home with that name!</red> <gray>Use <yellow>/sethome <name> -o</yellow> to overwrite a home</gray>"
   home-not-found: "<red>Home <yellow><name></yellow> not found</red>"
-  null-home: "<red>Home <name> does not exist</red>"
+  null-home: "<red>Home '<name>' does not exist</red>"
+  cannot-set-more-homes: "<red>You have already set <dark_red><bold><value></bold></dark_red> homes- you cannot set any more. Delete one of your current homes to set a new one.</red>"
 messages:
   home-set: "<green>Home <name> has been set</green>"
   home-deleted: "<gray>Home <yellow><name></yellow> in <yellow><world></yellow> at <yellow><x_loc>x</yellow>, <yellow><y_loc>y</yellow>, <yellow><z_loc>z</yellow> has been deleted</gray>"

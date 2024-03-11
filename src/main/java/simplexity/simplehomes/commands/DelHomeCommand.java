@@ -29,7 +29,7 @@ public class DelHomeCommand implements TabExecutor {
             return false;
         }
         List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
-        String homeName = args[0];
+        String homeName = args[0].toLowerCase();
         if (homeExists(playerHomes, homeName)) {
             Home home = SQLiteHandler.getInstance().getHome(player, homeName);
             if (home == null) {

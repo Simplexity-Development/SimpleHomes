@@ -38,12 +38,19 @@ public class SetHomeCommand implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
             return false;
         }
-
-        // TODO: Determine where to put this logic
+        boolean overwrite = false;
+        if (args.length > 1) {
+            if (args[1].equalsIgnoreCase("-o")) {
+                overwrite = true;
+            }
+        }
+        String homeName = args[0].toLowerCase();
         int maxHomes = 0;
+        int currentHomes = playerHomes.size();
         for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
             String permission = pai.getPermission();
-            if (permission.length() <= 12 && !permission.startsWith("homes.count.")) continue;
+            if (!pai.getValue()) continue;
+            if (permission.length() <= 12 || !permission.startsWith("homes.count.")) continue;
             try {
                 int homeCount = Integer.parseInt(permission.substring(12));
                 if (maxHomes < homeCount) maxHomes = homeCount;
@@ -51,16 +58,16 @@ public class SetHomeCommand implements TabExecutor {
                 SimpleHomes.getInstance().getLogger().warning("Found homes permission with invalid number format: " + permission);
             }
         }
-        // TODO: End TODO
-
-        Location playerLocation = player.getLocation().toCenterLocation();
-        String homeName = args[0];
-        boolean overwrite = false;
-        if (args.length > 1) {
-            if (args[1].equalsIgnoreCase("-o")) {
-                overwrite = true;
+        if (!player.hasPermission("homes.count.bypass") && currentHomes >= maxHomes && !overwrite) {
+            if (homeExists(playerHomes, homeName)) {
+                player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
+                return false;
             }
+            player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getCannotSetMoreHomes(),
+                    Placeholder.unparsed("value", String.valueOf(maxHomes))));
+            return false;
         }
+        Location playerLocation = player.getLocation().toCenterLocation();
         if (!SQLiteHandler.getInstance().setHome(player, homeName, playerLocation, overwrite)) {
             player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
             return false;
@@ -74,6 +81,15 @@ public class SetHomeCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         return List.of("");
+    }
+    
+    private boolean homeExists(List<Home> homes, String homeName) {
+        for (Home home : homes) {
+            if (home.getName().equalsIgnoreCase(homeName)) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }

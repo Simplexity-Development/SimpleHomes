@@ -17,7 +17,7 @@ public class LocaleHandler {
     private final FileConfiguration localeConfig = new YamlConfiguration();
     private final Logger logger = SimpleHomes.getInstance().getLogger();
     //---------
-    private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome;
+    private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome, cannotSetMoreHomes;
     private String homeSet, homeDeleted, homeTeleported;
     
     private LocaleHandler(){
@@ -47,6 +47,7 @@ public class LocaleHandler {
         homeAlreadyExists = localeConfig.getString("errors.home-already-exists");
         homeNotFound = localeConfig.getString("errors.home-not-found");
         nullHome = localeConfig.getString("errors.null-home");
+        cannotSetMoreHomes = localeConfig.getString("errors.cannot-set-more-homes");
         homeSet = localeConfig.getString("messages.home-set");
         homeDeleted = localeConfig.getString("messages.home-deleted");
         homeTeleported = localeConfig.getString("messages.home-teleported");
@@ -78,5 +79,9 @@ public class LocaleHandler {
     
     public String getHomeTeleported() {
         return homeTeleported;
+    }
+    
+    public String getCannotSetMoreHomes() {
+        return cannotSetMoreHomes;
     }
 }

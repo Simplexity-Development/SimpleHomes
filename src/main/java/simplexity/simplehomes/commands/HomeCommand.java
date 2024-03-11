@@ -13,6 +13,7 @@ import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLiteHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeCommand implements TabExecutor {
@@ -29,14 +30,12 @@ public class HomeCommand implements TabExecutor {
             return false;
         }
         List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
-        String homeName = args[0];
+        String homeName = args[0].toLowerCase();
         Home home = null;
         if (homeExists(playerHomes, homeName)) {
             home = SQLiteHandler.getInstance().getHome(player, homeName);
         }
         if (home == null) {
-            SimpleHomes.getInstance().getLogger().severe(player.getName() + " tried to access home " + homeName
-                    + " but it was null");
             player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getNullHome(),
                     Placeholder.parsed("name", homeName)));
             return false;
@@ -49,6 +48,13 @@ public class HomeCommand implements TabExecutor {
     
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if (args.length < 2 && sender instanceof Player player) {
+            List<String> homeList = new ArrayList<>();
+            for (Home home : SQLiteHandler.getInstance().getHomes(player)) {
+                homeList.add(home.getName());
+            }
+            return homeList;
+        }
         return null;
     }
     
