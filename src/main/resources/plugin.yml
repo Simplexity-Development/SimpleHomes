@@ -22,3 +22,6 @@ permissions:
   homes.delhome:
     default: op
     description: allows player to delete home
+  homes.teleport:
+    default: op
+    description: allows player to teleport to home
