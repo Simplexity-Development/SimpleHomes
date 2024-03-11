@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
@@ -37,6 +38,21 @@ public class SetHomeCommand implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
             return false;
         }
+
+        // TODO: Determine where to put this logic
+        int maxHomes = 0;
+        for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
+            String permission = pai.getPermission();
+            if (permission.length() <= 12 && !permission.startsWith("homes.count.")) continue;
+            try {
+                int homeCount = Integer.parseInt(permission.substring(12));
+                if (maxHomes < homeCount) maxHomes = homeCount;
+            } catch (NumberFormatException e) {
+                SimpleHomes.getInstance().getLogger().warning("Found homes permission with invalid number format: " + permission);
+            }
+        }
+        // TODO: End TODO
+
         Location playerLocation = player.getLocation().toCenterLocation();
         String homeName = args[0];
         boolean overwrite = false;
