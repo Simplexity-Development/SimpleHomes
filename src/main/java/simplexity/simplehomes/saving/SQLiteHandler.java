@@ -63,10 +63,12 @@ public class SQLiteHandler extends SaveHandler {
                 statement.setString(1, player.getUniqueId().toString());
                 try (ResultSet resultSet = statement.executeQuery()) {
                     while (resultSet.next()) {
+                        String worldUUIDString = resultSet.getString("world_uuid");
+                        UUID worldUUID = UUID.fromString(worldUUIDString);
                         homes.add(new Home(
                                 resultSet.getString("home_name"),
                                 new Location(
-                                        SimpleHomes.getInstance().getServer().getWorld(resultSet.getString("world_uuid")),
+                                        SimpleHomes.getInstance().getServer().getWorld(worldUUID),
                                         resultSet.getInt("location_x"),
                                         resultSet.getInt("location_y"),
                                         resultSet.getInt("location_z")

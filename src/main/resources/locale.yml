@@ -5,7 +5,19 @@ errors:
   home-not-found: "<red>Home <yellow><name></yellow> not found</red>"
   null-home: "<red>Home '<name>' does not exist</red>"
   cannot-set-more-homes: "<red>You have already set <dark_red><bold><value></bold></dark_red> homes- you cannot set any more. Delete one of your current homes to set a new one.</red>"
+# for the inserts, please keep the word inside of angle brackets, or it won't work properly
+# such as 'world: <world>' -
+inserts:
+  name: "<yellow><name></yellow>"
+  world: "<yellow><world></yellow>"
+  x-loc: "<yellow><x-loc>x</yellow>,"
+  y-loc: "<yellow><y-loc>y</yellow>,"
+  z-loc: "<yellow><z-loc>z</yellow>"
 messages:
   home-set: "<green>Home <name> has been set</green>"
-  home-deleted: "<gray>Home <yellow><name></yellow> in <yellow><world></yellow> at <yellow><x_loc>x</yellow>, <yellow><y_loc>y</yellow>, <yellow><z_loc>z</yellow> has been deleted</gray>"
+  home-deleted: "<gray>Home <name> in <world> at <x-loc> <y-loc> <z-loc> has been deleted</gray>"
   home-teleported: "<gray>Teleported successfully to <yellow><name></yellow></gray>"
+  plugin-reloaded: "<gold>SimpleHomes has been reloaded</gold>"
+  list-header: "<white><bold>[</bold><aqua>Homes</aqua><bold>]</bold></white>"
+  list-item: "<gray>  - <name> in <world> at <x-loc> <y-loc> <z-loc>"
+  list-no-homes: "<gray>You have no homes set</gray>"

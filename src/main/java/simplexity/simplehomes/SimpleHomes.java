@@ -2,9 +2,12 @@ package simplexity.simplehomes;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.plugin.java.JavaPlugin;
-import simplexity.simplehomes.commands.DelHomeCommand;
-import simplexity.simplehomes.commands.HomeCommand;
-import simplexity.simplehomes.commands.SetHomeCommand;
+import simplexity.simplehomes.commands.DeleteHome;
+import simplexity.simplehomes.commands.HomeList;
+import simplexity.simplehomes.commands.Home;
+import simplexity.simplehomes.commands.HomesReload;
+import simplexity.simplehomes.commands.SetHome;
+import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLiteHandler;
 
@@ -18,13 +21,10 @@ public final class SimpleHomes extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+        ConfigHandler.loadConfigValues();
         LocaleHandler.getInstance().loadLocale();
         SQLiteHandler.getInstance().init();
-        this.getCommand("sethome").setExecutor(new SetHomeCommand());
-        this.getCommand("delhome").setExecutor(new DelHomeCommand());
-        this.getCommand("home").setExecutor(new HomeCommand());
-        // Plugin startup logic
-        
+        registerCommands();
     }
     
     public static SimpleHomes getInstance() {
@@ -37,5 +37,13 @@ public final class SimpleHomes extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+    
+    private void registerCommands(){
+        this.getCommand("sethome").setExecutor(new SetHome());
+        this.getCommand("delhome").setExecutor(new DeleteHome());
+        this.getCommand("home").setExecutor(new Home());
+        this.getCommand("homelist").setExecutor(new HomeList());
+        this.getCommand("homesreload").setExecutor(new HomesReload());
     }
 }

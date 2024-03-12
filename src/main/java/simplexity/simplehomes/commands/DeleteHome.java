@@ -1,5 +1,6 @@
 package simplexity.simplehomes.commands;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
@@ -10,15 +11,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
+import simplexity.simplehomes.Util;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLiteHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeCommand implements TabExecutor {
+public class DeleteHome implements TabExecutor {
     MiniMessage miniMessage = SimpleHomes.getMiniMessage();
-
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
@@ -31,18 +32,23 @@ public class HomeCommand implements TabExecutor {
         }
         List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
         String homeName = args[0].toLowerCase();
-        Home home = null;
-        if (homeExists(playerHomes, homeName)) {
-            home = SQLiteHandler.getInstance().getHome(player, homeName);
+        if (Util.homeExists(playerHomes, homeName)) {
+            Home home = SQLiteHandler.getInstance().getHome(player, homeName);
+            if (home == null) {
+                SimpleHomes.getInstance().getLogger().severe("HOME WAS NULL, RETURNING");
+                return false;
+            }
+            Component messageToSend = LocaleHandler.getInstance().locationResolver(home, LocaleHandler.getInstance().getHomeDeleted());
+            if (messageToSend == null) {
+                SimpleHomes.getInstance().getLogger().warning("Unable to load 'messages.home-deleted' from locale.yml, please check your locale");
+                messageToSend = miniMessage.deserialize("<yellow>Home was deleted></yellow>");
+            }
+            SQLiteHandler.getInstance().deleteHome(player, homeName);
+            player.sendMessage(messageToSend);
+        } else {
+            player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeNotFound(),
+                    Placeholder.unparsed("name", homeName)));
         }
-        if (home == null) {
-            player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getNullHome(),
-                    Placeholder.parsed("name", homeName)));
-            return false;
-        }
-        player.teleport(home.getLocation());
-        player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeTeleported(),
-                Placeholder.parsed("name", homeName)));
         return false;
     }
     
@@ -58,12 +64,5 @@ public class HomeCommand implements TabExecutor {
         return null;
     }
     
-    private boolean homeExists(List<Home> homes, String homeName) {
-        for (Home home : homes) {
-            if (home.getName().equalsIgnoreCase(homeName)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    
 }

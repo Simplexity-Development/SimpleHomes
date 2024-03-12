@@ -12,6 +12,13 @@ commands:
   home:
     permission: homes.teleport
     description: Teleports to a home
+  homesreload:
+    permission: homes.reload
+    description: reloads the config
+  homelist:
+    permission: homes.list
+    description: lists your homes
+    alias: homes
 permissions:
   homes:
     default: op
@@ -31,3 +38,9 @@ permissions:
   homes.count.bypass:
     default: op
     description: allows for setting infinite homes regardless of how many you have set as the max
+  homes.reload:
+    default: op
+    description: allows reloading the config
+  homes.list:
+    default: op
+    description: allows you to list your own homes

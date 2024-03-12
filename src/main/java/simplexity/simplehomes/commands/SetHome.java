@@ -12,12 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
+import simplexity.simplehomes.Util;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLiteHandler;
 
 import java.util.List;
 
-public class SetHomeCommand implements TabExecutor {
+public class SetHome implements TabExecutor {
     
     MiniMessage miniMessage = SimpleHomes.getMiniMessage();
     // /sethome name
@@ -59,7 +60,7 @@ public class SetHomeCommand implements TabExecutor {
             }
         }
         if (!player.hasPermission("homes.count.bypass") && currentHomes >= maxHomes && !overwrite) {
-            if (homeExists(playerHomes, homeName)) {
+            if (Util.homeExists(playerHomes, homeName)) {
                 player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
                 return false;
             }
@@ -81,15 +82,6 @@ public class SetHomeCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         return List.of("");
-    }
-    
-    private boolean homeExists(List<Home> homes, String homeName) {
-        for (Home home : homes) {
-            if (home.getName().equalsIgnoreCase(homeName)) {
-                return true;
-            }
-        }
-        return false;
     }
     
 }
