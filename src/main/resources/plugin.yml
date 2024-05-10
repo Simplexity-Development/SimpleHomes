@@ -18,7 +18,6 @@ commands:
   homelist:
     permission: homes.list
     description: lists your homes
-    alias: homes
 permissions:
   homes:
     default: op

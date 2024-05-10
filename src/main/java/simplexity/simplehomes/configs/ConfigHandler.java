@@ -9,22 +9,15 @@ import java.util.List;
 
 public class ConfigHandler {
     
-    private static final ArrayList<Material> waterDangers = new ArrayList<>();
-    private static final ArrayList<Material> fireDangers = new ArrayList<>();
-    private static final ArrayList<Material> earthDangers = new ArrayList<>();
-    private static final ArrayList<Material> airDangers = new ArrayList<>();
-    
+    private static final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
+    private static final ArrayList<Material> nonFullBlocks = new ArrayList<>();
     public static void loadConfigValues() {
         SimpleHomes.getInstance().reloadConfig();
         FileConfiguration config = SimpleHomes.getInstance().getConfig();
-        List<String> waterList = config.getStringList("dangerous-blocks.water");
-        List<String> fireList = config.getStringList("dangerous-blocks.fire");
-        List<String> earthList = config.getStringList("dangerous-blocks.earth");
-        List<String> airList = config.getStringList("dangerous-blocks.air");
-        fillList(waterList, waterDangers);
-        fillList(fireList, fireDangers);
-        fillList(earthList, earthDangers);
-        fillList(airList, airDangers);
+        List<String> blockList = config.getStringList("blacklisted-blocks");
+        List<String> nonFullBlockList = config.getStringList("non-full-blocks");
+        fillList(blockList, blacklistedBlocks);
+        fillList(nonFullBlockList, nonFullBlocks);
     }
     
     private static void fillList(List<String> stringList, ArrayList<Material> materialList) {
@@ -40,19 +33,11 @@ public class ConfigHandler {
     }
     
     
-    public static ArrayList<Material> getWaterDangers() {
-        return waterDangers;
+    public static ArrayList<Material> getBlacklistedBlocks() {
+        return blacklistedBlocks;
     }
-    
-    public static ArrayList<Material> getFireDangers() {
-        return fireDangers;
+    public static ArrayList<Material> getNonFullBlocks() {
+        return nonFullBlocks;
     }
-    
-    public static ArrayList<Material> getEarthDangers() {
-        return earthDangers;
-    }
-    
-    public static ArrayList<Material> getAirDangers() {
-        return airDangers;
-    }
+
 }

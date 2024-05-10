@@ -23,9 +23,9 @@ public class LocaleHandler {
     private final Logger logger = SimpleHomes.getInstance().getLogger();
     //---------
     private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome, cannotSetMoreHomes;
-    private String insertName, insertWorld, insertXLoc, insertYLoc, insertZLoc;
+    private String insertName, insertWorld, insertXLoc, insertYLoc, insertZLoc, insertOverride;
     private String homeSet, homeDeleted, homeTeleported, pluginReloaded, listHeader, listItem, listNoHomes;
-    
+    private String blacklistedWarning, voidWarning, fireWarning, blocksWarning, lavaWarning, waterWarning, notSolidWarning;
     private LocaleHandler() {
         if (!localeFile.exists()) {
             SimpleHomes.getInstance().saveResource(fileName, false);
@@ -48,24 +48,32 @@ public class LocaleHandler {
             logger.severe("Issue loading locale.yml");
             e.printStackTrace();
         }
-        mustBePlayer = localeConfig.getString("errors.must-be-player");
-        provideHomeName = localeConfig.getString("errors.provide-home-name");
-        homeAlreadyExists = localeConfig.getString("errors.home-already-exists");
-        homeNotFound = localeConfig.getString("errors.home-not-found");
-        nullHome = localeConfig.getString("errors.null-home");
-        cannotSetMoreHomes = localeConfig.getString("errors.cannot-set-more-homes");
-        insertName = localeConfig.getString("inserts.name");
-        insertWorld = localeConfig.getString("inserts.world");
-        insertXLoc = localeConfig.getString("inserts.x-loc");
-        insertYLoc = localeConfig.getString("inserts.y-loc");
-        insertZLoc = localeConfig.getString("inserts.z-loc");
-        listHeader = localeConfig.getString("messages.list-header");
-        listItem = localeConfig.getString("messages.list-item");
-        listNoHomes = localeConfig.getString("messages.list-no-homes");
-        homeSet = localeConfig.getString("messages.home-set");
-        homeDeleted = localeConfig.getString("messages.home-deleted");
-        homeTeleported = localeConfig.getString("messages.home-teleported");
-        pluginReloaded = localeConfig.getString("messages.plugin-reloaded");
+        mustBePlayer = localeConfig.getString("errors.must-be-player", "<red>Sorry, only a player can run that command!</red>");
+        provideHomeName = localeConfig.getString("errors.provide-home-name", "<gray>Please provide a home name</gray>");
+        homeAlreadyExists = localeConfig.getString("errors.home-already-exists", "<red>Sorry, you already have a home with that name!</red> <gray>Use <yellow>/sethome <name> -o</yellow> to overwrite a home</gray>");
+        homeNotFound = localeConfig.getString("errors.home-not-found", "<red>Home <yellow><name></yellow> not found</red>");
+        nullHome = localeConfig.getString("errors.null-home", "<red>Home '<name>' does not exist</red>");
+        cannotSetMoreHomes = localeConfig.getString("errors.cannot-set-more-homes", "<red>You have already set <dark_red><bold><value></bold></dark_red> homes- you cannot set any more. Delete one of your current homes to set a new one.</red>");
+        insertName = localeConfig.getString("inserts.name", "<yellow><name></yellow>");
+        insertWorld = localeConfig.getString("inserts.world", "<yellow><world></yellow>");
+        insertXLoc = localeConfig.getString("inserts.x-loc", "<yellow><x-loc>x</yellow>,");
+        insertYLoc = localeConfig.getString("inserts.y-loc", "<yellow><y-loc>y</yellow>,");
+        insertZLoc = localeConfig.getString("inserts.z-loc", "<yellow><z-loc>z</yellow>");
+        insertOverride = localeConfig.getString("inserts.override", "<gray>You can type <yellow>/home <name> -o</yellow> in order to teleport anyways</gray>");
+        listHeader = localeConfig.getString("messages.list-header", "<white><bold>[</bold><aqua>Homes</aqua><bold>]</bold></white>");
+        listItem = localeConfig.getString("messages.list-item", "<gray>  - <name> in <world> at <x-loc> <y-loc> <z-loc>");
+        listNoHomes = localeConfig.getString("messages.list-no-homes", "<gray>You have no homes set</gray>");
+        homeSet = localeConfig.getString("messages.home-set", "<green>Home <name> has been set</green>");
+        homeDeleted = localeConfig.getString("messages.home-deleted", "<gray>Home <name> in <world> at <x-loc> <y-loc> <z-loc> has been deleted</gray>");
+        homeTeleported = localeConfig.getString("messages.home-teleported", "<gray>Teleported successfully to <yellow><name></yellow></gray>");
+        pluginReloaded = localeConfig.getString("messages.plugin-reloaded", "<gold>SimpleHomes has been reloaded</gold>");
+        blacklistedWarning = localeConfig.getString("warnings.blacklisted", "<red>There is a <block> blocking your teleport location.</red> ");
+        voidWarning = localeConfig.getString("warnings.void", "<red>Your home is currently above air.</red> ");
+        fireWarning = localeConfig.getString("warnings.fire", "<red>Your home is currently on fire</red> ");
+        blocksWarning = localeConfig.getString("warnings.blocks", "<red>Your home is currently encased in blocks</red> ");
+        lavaWarning = localeConfig.getString("warnings.lava", "<red>Your home is currently inside of lava</red> ");
+        waterWarning = localeConfig.getString("warnings.water", "<red>Your home is currently under water</red> ");
+        notSolidWarning = localeConfig.getString("warnings.not-solid", "<red>Your home is currently not on a solid block</red> ");
         
     }
     
@@ -162,5 +170,37 @@ public class LocaleHandler {
     
     public String getListNoHomes() {
         return listNoHomes;
+    }
+
+    public String getBlacklistedWarning() {
+        return blacklistedWarning;
+    }
+
+    public String getVoidWarning() {
+        return voidWarning;
+    }
+
+    public String getFireWarning() {
+        return fireWarning;
+    }
+
+    public String getBlocksWarning() {
+        return blocksWarning;
+    }
+
+    public String getLavaWarning() {
+        return lavaWarning;
+    }
+
+    public String getWaterWarning() {
+        return waterWarning;
+    }
+
+    public String getInsertOverride() {
+        return insertOverride;
+    }
+
+    public String getNotSolidWarning() {
+        return notSolidWarning;
     }
 }
