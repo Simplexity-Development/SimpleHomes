@@ -151,15 +151,15 @@ public class LocaleHandler {
             return null;
         }
         Component nameComponent = miniMessage.deserialize(insertName,
-                Placeholder.unparsed("name", home.getName()));
+                Placeholder.unparsed("name", home.name()));
         Component worldComponent = miniMessage.deserialize(insertWorld,
-                Placeholder.unparsed("world", home.getLocation().getWorld().getName()));
+                Placeholder.unparsed("world", home.location().getWorld().getName()));
         Component xComponent = miniMessage.deserialize(insertXLoc,
-                Placeholder.unparsed("x-loc", String.valueOf(home.getLocation().getX())));
+                Placeholder.unparsed("x-loc", String.valueOf(home.location().getX())));
         Component yComponent = miniMessage.deserialize(insertYLoc,
-                Placeholder.unparsed("y-loc", String.valueOf(home.getLocation().getY())));
+                Placeholder.unparsed("y-loc", String.valueOf(home.location().getY())));
         Component zComponent = miniMessage.deserialize(insertZLoc,
-                Placeholder.unparsed("z-loc", String.valueOf(home.getLocation().getZ())));
+                Placeholder.unparsed("z-loc", String.valueOf(home.location().getZ())));
         return miniMessage.deserialize(message,
                 Placeholder.component("name", nameComponent),
                 Placeholder.component("world", worldComponent),

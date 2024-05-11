@@ -57,7 +57,7 @@ public class DeleteHome implements TabExecutor {
         if (args.length < 2 && sender instanceof Player player) {
             List<String> homeList = new ArrayList<>();
             for (Home home : SQLiteHandler.getInstance().getHomes(player)) {
-                homeList.add(home.getName());
+                homeList.add(home.name());
             }
             return homeList;
         }

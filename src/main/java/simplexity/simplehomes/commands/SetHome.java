@@ -11,8 +11,10 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
+import simplexity.simplehomes.SafetyCheck;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.Util;
+import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLiteHandler;
 
@@ -51,7 +53,7 @@ public class SetHome implements TabExecutor {
         for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
             String permission = pai.getPermission();
             if (!pai.getValue()) continue;
-            if (permission.length() <= 12 || !permission.startsWith("homes.count.")) continue;
+            if (permission.length() <= 12 || !permission.startsWith("homes.count.") || permission.equals("homes.count.bypass")) continue;
             try {
                 int homeCount = Integer.parseInt(permission.substring(12));
                 if (maxHomes < homeCount) maxHomes = homeCount;
@@ -68,20 +70,18 @@ public class SetHome implements TabExecutor {
                     Placeholder.unparsed("value", String.valueOf(maxHomes))));
             return false;
         }
-        Location playerLocation = player.getLocation().toCenterLocation();
-        if (!SQLiteHandler.getInstance().setHome(player, homeName, playerLocation, overwrite)) {
+        if (!SQLiteHandler.getInstance().setHome(player, homeName,player, overwrite)) {
             player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
             return false;
         }
-        
         player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeSet(),
                 Placeholder.unparsed("name", homeName)));
         return true;
     }
-    
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        return List.of("");
+        return List.of();
     }
-    
+
 }

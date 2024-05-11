@@ -22,15 +22,15 @@ permissions:
   homes:
     default: op
     description: allows base plugin functionality
-  homes.sethome:
+  homes.commands:
+    default: op
+    description: allows player to use commands
+  homes.commands.sethome:
     default: op
     description: allows player to set home
-  homes.delhome:
+  homes.commands.delhome:
     default: op
     description: allows player to delete home
-  homes.teleport:
-    default: op
-    description: allows player to teleport to home
   homes.count:
     default: op
     description: base for permission on number of homes you can have
@@ -43,3 +43,6 @@ permissions:
   homes.list:
     default: op
     description: allows you to list your own homes
+  homes.safety.bypass:
+    default: false
+    description: allows bypassing the safety checks

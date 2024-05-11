@@ -3,9 +3,10 @@ package simplexity.simplehomes;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockSupport;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.*;
-import simplexity.simplehomes.configs.ConfigHandler;
 
 import java.util.List;
 
@@ -54,7 +55,14 @@ public class SafetyCheck {
         return materialList.contains(location.getBlock().getType());
     }
 
-    public static boolean teleportingOntoFullBlock(Location location) {
+    public static boolean isNotGonnaTeleportThemThroughTheFloor(Location location, List<Material> nonFullBlockList){
+        if (!teleportingOntoFullBlock(location, nonFullBlockList)) {
+            return teleportingOntoSturdyBlock(location);
+        } else {
+            return true;
+        }
+    }
+    public static boolean teleportingOntoFullBlock(Location location, List<Material> materialList) {
         Block block = location.getBlock();
         BlockData blockData = block.getBlockData();
         if (blockData instanceof TrapDoor) return false;
@@ -67,14 +75,14 @@ public class SafetyCheck {
         if (blockData instanceof Bed) return false;
         if (blockData instanceof Campfire) return false;
         if (blockData instanceof Lantern) return false;
-        if (ConfigHandler.getNonFullBlocks().contains(block.getType())) return false;
+        if (materialList.contains(block.getType())) return false;
         return true;
     }
 
-    public static boolean teleportingOntoSolidBlock(Location location) {
+    public static boolean teleportingOntoSturdyBlock(Location location) {
         Location locationBelow = location.clone().add(0, -1, 0);
         Block block = locationBelow.getBlock();
-        return block.isSolid();
+        return block.getBlockData().isFaceSturdy(BlockFace.UP, BlockSupport.FULL);
     }
 
 }

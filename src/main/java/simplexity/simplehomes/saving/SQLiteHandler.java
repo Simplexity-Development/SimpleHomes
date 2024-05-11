@@ -2,6 +2,7 @@ package simplexity.simplehomes.saving;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.saving.SaveHandler;
@@ -41,9 +42,11 @@ public class SQLiteHandler extends SaveHandler {
                         home_name VARCHAR(255),
                         world_uuid VARCHAR(255),
                         world_name VARCHAR(255),
-                        location_x INT,
-                        location_y INT,
-                        location_z INT
+                        location_x DOUBLE,
+                        location_y DOUBLE,
+                        location_z DOUBLE,
+                        pitch FLOAT,
+                        yaw FLOAT
                         );""");
             }
             
@@ -69,9 +72,11 @@ public class SQLiteHandler extends SaveHandler {
                                 resultSet.getString("home_name"),
                                 new Location(
                                         SimpleHomes.getInstance().getServer().getWorld(worldUUID),
-                                        resultSet.getInt("location_x"),
-                                        resultSet.getInt("location_y"),
-                                        resultSet.getInt("location_z")
+                                        resultSet.getDouble("location_x"),
+                                        resultSet.getDouble("location_y"),
+                                        resultSet.getDouble("location_z"),
+                                        resultSet.getFloat("pitch"),
+                                        resultSet.getFloat("yaw")
                                 )
                         ));
                     }
@@ -104,9 +109,11 @@ public class SQLiteHandler extends SaveHandler {
                                 resultSet.getString("home_name"),
                                 new Location(
                                         SimpleHomes.getInstance().getServer().getWorld(worldUUID),
-                                        resultSet.getInt("location_x"),
-                                        resultSet.getInt("location_y"),
-                                        resultSet.getInt("location_z")
+                                        resultSet.getDouble("location_x"),
+                                        resultSet.getDouble("location_y"),
+                                        resultSet.getDouble("location_z"),
+                                        resultSet.getFloat("pitch"),
+                                        resultSet.getFloat("yaw")
                                 )
                         );
                     }
@@ -152,7 +159,7 @@ public class SQLiteHandler extends SaveHandler {
     }
     
     @Override
-    public boolean setHome(OfflinePlayer player, String homeName, Location location, boolean overwrite) {
+    public boolean setHome(OfflinePlayer player, String homeName, Player onlinePlayer, boolean overwrite) {
         try {
             // Prepare the SQL statement to check if the home exists
             String checkIfExistsQuery = "SELECT COUNT(*) AS count FROM homes WHERE player_uuid = ? AND home_name = ?";
@@ -171,15 +178,17 @@ public class SQLiteHandler extends SaveHandler {
             }
             // Insert the new home
             String insertQuery = "REPLACE INTO homes (player_uuid_and_name, player_uuid, home_name, world_uuid, location_x, location_y, " +
-                    "location_z) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                    "location_z, pitch, yaw) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
                 insertStatement.setString(1, player.getUniqueId() + homeName);
                 insertStatement.setString(2, player.getUniqueId().toString());
                 insertStatement.setString(3, homeName);
-                insertStatement.setString(4, String.valueOf(location.getWorld().getUID()));
-                insertStatement.setInt(5, location.getBlockX());
-                insertStatement.setInt(6, location.getBlockY());
-                insertStatement.setInt(7, location.getBlockZ());
+                insertStatement.setString(4, String.valueOf(onlinePlayer.getWorld().getUID()));
+                insertStatement.setDouble(5, onlinePlayer.getX());
+                insertStatement.setDouble(6, onlinePlayer.getY());
+                insertStatement.setDouble(7, onlinePlayer.getZ());
+                insertStatement.setFloat(8, onlinePlayer.getPitch());
+                insertStatement.setFloat(9, onlinePlayer.getYaw());
                 insertStatement.executeUpdate();
             }
             return true; // Home set successfully

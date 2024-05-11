@@ -45,7 +45,7 @@ public class Home implements TabExecutor {
             player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getNullHome(), Placeholder.parsed("name", homeName)));
             return false;
         }
-        Location homeLocation = home.getLocation();
+        Location homeLocation = home.location();
         boolean bypass = false;
         if (args.length > 1) {
             if (args[1].equalsIgnoreCase("-o")) {
@@ -59,16 +59,16 @@ public class Home implements TabExecutor {
 
     private boolean safeTeleport(Location location, boolean bypass, Player player) {
         if (bypass) {
-            player.teleport(location.toCenterLocation());
+            player.teleport(location);
             return true;
         }
-        boolean adjustTeleportLocation = false;
+        //boolean adjustTeleportLocation = false;
         String overrideString = LocaleHandler.getInstance().getInsertOverride();
-        if (!SafetyCheck.teleportingOntoFullBlock(location)) {
+        /*if (!SafetyCheck.teleportingOntoFullBlock(location, ConfigHandler.getNonFullBlocks())) {
             adjustTeleportLocation = true;
             location.add(0, 1, 0);
-        }
-        if (!SafetyCheck.teleportingOntoSolidBlock(location) &&
+        }*/
+        if (!SafetyCheck.teleportingOntoSturdyBlock(location) &&
                 !(playerBypass(player) || player.isFlying())) {
             player.sendRichMessage(LocaleHandler.getInstance().getNotSolidWarning() + overrideString);
             return false;
@@ -103,17 +103,17 @@ public class Home implements TabExecutor {
             player.sendRichMessage(LocaleHandler.getInstance().getBlacklistedWarning() + overrideString, Placeholder.parsed("block", location.getBlock().getType().toString().toLowerCase(Locale.ROOT)));
             return false;
         }
-        if (adjustTeleportLocation) {
+        /*if (adjustTeleportLocation) {
             Location adjustedLocation = location.clone().add(0, 1, 0).toCenterLocation();
             player.teleport(adjustedLocation);
             return true;
-        }
-        player.teleport(location.toCenterLocation());
+        }*/
+        player.teleport(location);
         return true;
     }
 
     private boolean playerBypass(Player player) {
-        if (player.hasPermission("homes.bypass.safety")) return true;
+        if (player.hasPermission("homes.safety.bypass")) return true;
         if (player.getGameMode().equals(GameMode.SPECTATOR)) return true;
         if (player.getGameMode().equals(GameMode.CREATIVE)) return true;
         if (player.isInvulnerable()) return true;
@@ -133,7 +133,7 @@ public class Home implements TabExecutor {
         if (args.length < 2 && sender instanceof Player player) {
             List<String> homeList = new ArrayList<>();
             for (simplexity.simplehomes.Home home : SQLiteHandler.getInstance().getHomes(player)) {
-                homeList.add(home.getName());
+                homeList.add(home.name());
             }
             return homeList;
         }

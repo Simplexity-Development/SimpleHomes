@@ -6,7 +6,7 @@ public class Util {
     
     public static boolean homeExists(List<Home> homes, String homeName) {
         for (Home home : homes) {
-            if (home.getName().equalsIgnoreCase(homeName)) {
+            if (home.name().equalsIgnoreCase(homeName)) {
                 return true;
             }
         }
