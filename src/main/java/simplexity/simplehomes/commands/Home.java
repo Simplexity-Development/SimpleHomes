@@ -20,7 +20,6 @@ import simplexity.simplehomes.saving.SQLiteHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class Home implements TabExecutor {
     MiniMessage miniMessage = SimpleHomes.getMiniMessage();
@@ -58,75 +57,86 @@ public class Home implements TabExecutor {
     }
 
     private boolean safeTeleport(Location location, boolean bypass, Player player) {
-        if (bypass) {
+        if (bypassSafetyChecks(player, bypass)) {
             player.teleport(location);
             return true;
         }
-        //boolean adjustTeleportLocation = false;
-        String overrideString = LocaleHandler.getInstance().getInsertOverride();
-        /*if (!SafetyCheck.teleportingOntoFullBlock(location, ConfigHandler.getNonFullBlocks())) {
-            adjustTeleportLocation = true;
-            location.add(0, 1, 0);
-        }*/
-        if (!SafetyCheck.teleportingOntoSturdyBlock(location) &&
-                !(playerBypass(player) || player.isFlying())) {
-            player.sendRichMessage(LocaleHandler.getInstance().getNotSolidWarning() + overrideString);
+        if (homeAboveAir(player, location)) {
             return false;
         }
-        if (SafetyCheck.teleportingIntoVoid(location) &&
-                !(playerBypass(player) || player.isFlying())) {
-            player.sendRichMessage(LocaleHandler.getInstance().getVoidWarning() + overrideString);
+        if (homeOnFire(player, location)) {
             return false;
         }
-        if (SafetyCheck.teleportingIntoFire(location) &&
-                !playerBypass(player, List.of(PotionEffectType.FIRE_RESISTANCE))) {
-            player.sendRichMessage(LocaleHandler.getInstance().getFireWarning() + overrideString);
+        if (homeInBlocks(player, location)) {
             return false;
         }
-        if (SafetyCheck.teleportingIntoSolidBlocks(location) &&
-                !playerBypass(player)) {
-            player.sendRichMessage(LocaleHandler.getInstance().getBlocksWarning() + overrideString);
+        if (homeUnderWater(player, location)) {
             return false;
         }
-        if (SafetyCheck.teleportingIntoLava(location) &&
-                !playerBypass(player, List.of(PotionEffectType.FIRE_RESISTANCE))) {
-            player.sendRichMessage(LocaleHandler.getInstance().getLavaWarning() + overrideString);
-            return false;
-        }
-        if (SafetyCheck.teleportingUnderWater(location) &&
-                !playerBypass(player, List.of(PotionEffectType.WATER_BREATHING, PotionEffectType.CONDUIT_POWER))) {
-            player.sendRichMessage(LocaleHandler.getInstance().getWaterWarning() + overrideString);
-            return false;
-        }
-        if (SafetyCheck.teleportingIntoBlacklistedBlocks(location, ConfigHandler.getBlacklistedBlocks()) &&
-                !playerBypass(player)) {
-            player.sendRichMessage(LocaleHandler.getInstance().getBlacklistedWarning() + overrideString, Placeholder.parsed("block", location.getBlock().getType().toString().toLowerCase(Locale.ROOT)));
-            return false;
-        }
-        /*if (adjustTeleportLocation) {
-            Location adjustedLocation = location.clone().add(0, 1, 0).toCenterLocation();
-            player.teleport(adjustedLocation);
-            return true;
-        }*/
         player.teleport(location);
         return true;
     }
 
-    private boolean playerBypass(Player player) {
-        if (player.hasPermission("homes.safety.bypass")) return true;
-        if (player.getGameMode().equals(GameMode.SPECTATOR)) return true;
-        if (player.getGameMode().equals(GameMode.CREATIVE)) return true;
-        if (player.isInvulnerable()) return true;
-        return false;
-    }
 
-    private boolean playerBypass(Player player, List<PotionEffectType> potionEffects) {
-        if (playerBypass(player)) return true;
+    private boolean checkPotionEffects(Player player, List<PotionEffectType> potionEffects) {
         for (PotionEffectType potionEffect : potionEffects) {
             if (player.hasPotionEffect(potionEffect)) return true;
         }
         return false;
     }
+
+    private boolean homeAboveAir(Player player, Location location) {
+        if (player.isFlying()) return false;
+        if (SafetyCheck.willFall(location)) {
+            player.sendRichMessage(LocaleHandler.getInstance().getVoidWarning() + LocaleHandler.getInstance().getInsertOverride());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean homeOnFire(Player player, Location location) {
+        if (checkPotionEffects(player, List.of(PotionEffectType.FIRE_RESISTANCE))) return false;
+        if (SafetyCheck.insideFire(location)) {
+            player.sendRichMessage(LocaleHandler.getInstance().getFireWarning() + LocaleHandler.getInstance().getInsertOverride());
+            return true;
+        }
+        if (SafetyCheck.insideLava(location)) {
+            player.sendRichMessage(LocaleHandler.getInstance().getLavaWarning() + LocaleHandler.getInstance().getInsertOverride());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean homeInBlocks(Player player, Location location) {
+        if (SafetyCheck.insideSolidBlocks(location)) {
+            player.sendRichMessage(LocaleHandler.getInstance().getBlocksWarning() + LocaleHandler.getInstance().getInsertOverride());
+            return true;
+        }
+        if (SafetyCheck.insideBlacklistedBlocks(location, ConfigHandler.getInstance().getBlacklistedBlocks())) {
+            player.sendRichMessage(LocaleHandler.getInstance().getBlacklistedWarning() + LocaleHandler.getInstance().getInsertOverride());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean homeUnderWater(Player player, Location location) {
+        if (SafetyCheck.underWater(location)) {
+            player.sendRichMessage(LocaleHandler.getInstance().getWaterWarning() + LocaleHandler.getInstance().getInsertOverride());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean bypassSafetyChecks(Player player, boolean bypass) {
+        if (bypass) return true;
+        if (player.hasPermission("homes.safety.bypass")) return true;
+        if (player.getGameMode().equals(GameMode.SPECTATOR)) return true;
+        if (ConfigHandler.getInstance().doCreativeBypass() && player.getGameMode().equals(GameMode.CREATIVE))
+            return true;
+        if (ConfigHandler.getInstance().doInvulnerableBypass() && player.isInvulnerable()) return true;
+        return false;
+    }
+
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {

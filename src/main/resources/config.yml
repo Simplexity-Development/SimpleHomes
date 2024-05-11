@@ -2,10 +2,8 @@
 blacklisted-blocks:
   - "minecraft:cactus"
   - "minecraft:sweet_berry_bush"
-  - "minecraft:powdered_snow"
-# Trapdoors, Slabs, Stairs, Walls, Fences, Fence gates, Beds, Campfires, Lanterns and Chests have been accounted for already
-non-full-blocks:
-  - "minecraft:dirt_path"
-  - "minecraft:enchanting_table"
-  - "minecraft:pointed_dripstone"
-  - "minecraft:soul_sand"
+  - "minecraft:powder_snow"
+# whether the safety checks should be bypassed when players are in these states - a bypass permission can also be granted
+safety-bypass:
+  creative: true
+  invulnerable: true

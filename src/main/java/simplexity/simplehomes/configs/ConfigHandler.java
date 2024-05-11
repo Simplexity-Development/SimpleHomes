@@ -8,19 +8,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigHandler {
-    
-    private static final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
-    private static final ArrayList<Material> nonFullBlocks = new ArrayList<>();
-    public static void loadConfigValues() {
+
+    private static ConfigHandler instance;
+
+    private final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
+    private boolean creativeBypass, invulnerableBypass;
+
+    public static ConfigHandler getInstance() {
+        if (instance == null) instance = new ConfigHandler();
+        return instance;
+    }
+
+    public void loadConfigValues() {
         SimpleHomes.getInstance().reloadConfig();
         FileConfiguration config = SimpleHomes.getInstance().getConfig();
         List<String> blockList = config.getStringList("blacklisted-blocks");
-        List<String> nonFullBlockList = config.getStringList("non-full-blocks");
+        creativeBypass = config.getBoolean("safety-bypass.creative");
+        invulnerableBypass = config.getBoolean("safety-bypass.invulnerable");
         fillList(blockList, blacklistedBlocks);
-        fillList(nonFullBlockList, nonFullBlocks);
     }
-    
-    private static void fillList(List<String> stringList, ArrayList<Material> materialList) {
+
+    private void fillList(List<String> stringList, ArrayList<Material> materialList) {
         materialList.clear();
         for (String string : stringList) {
             Material material = Material.matchMaterial(string);
@@ -31,13 +39,17 @@ public class ConfigHandler {
             materialList.add(material);
         }
     }
-    
-    
-    public static ArrayList<Material> getBlacklistedBlocks() {
+
+
+    public ArrayList<Material> getBlacklistedBlocks() {
         return blacklistedBlocks;
     }
-    public static ArrayList<Material> getNonFullBlocks() {
-        return nonFullBlocks;
+
+    public boolean doCreativeBypass() {
+        return creativeBypass;
     }
 
+    public boolean doInvulnerableBypass() {
+        return invulnerableBypass;
+    }
 }

@@ -29,4 +29,3 @@ warnings:
   blocks: "<red>Your home is currently encased in blocks</red> "
   lava: "<red>Your home is currently inside of lava</red> "
   water: "<red>Your home is currently under water</red> "
-  not-solid: "<red>Your home is currently not on a solid block</red> "

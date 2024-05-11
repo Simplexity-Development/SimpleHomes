@@ -5,7 +5,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
-import simplexity.simplehomes.saving.SaveHandler;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class SQLiteHandler extends SaveHandler {
+ public class SQLiteHandler extends SaveHandler {
     
     Connection connection;
     Logger logger = SimpleHomes.getInstance().getLogger();
@@ -45,8 +44,8 @@ public class SQLiteHandler extends SaveHandler {
                         location_x DOUBLE,
                         location_y DOUBLE,
                         location_z DOUBLE,
-                        pitch FLOAT,
-                        yaw FLOAT
+                        yaw FLOAT,
+                        pitch FLOAT
                         );""");
             }
             
@@ -75,8 +74,8 @@ public class SQLiteHandler extends SaveHandler {
                                         resultSet.getDouble("location_x"),
                                         resultSet.getDouble("location_y"),
                                         resultSet.getDouble("location_z"),
-                                        resultSet.getFloat("pitch"),
-                                        resultSet.getFloat("yaw")
+                                        resultSet.getFloat("yaw"),
+                                        resultSet.getFloat("pitch")
                                 )
                         ));
                     }
@@ -112,8 +111,8 @@ public class SQLiteHandler extends SaveHandler {
                                         resultSet.getDouble("location_x"),
                                         resultSet.getDouble("location_y"),
                                         resultSet.getDouble("location_z"),
-                                        resultSet.getFloat("pitch"),
-                                        resultSet.getFloat("yaw")
+                                        resultSet.getFloat("yaw"),
+                                        resultSet.getFloat("pitch")
                                 )
                         );
                     }
@@ -178,7 +177,7 @@ public class SQLiteHandler extends SaveHandler {
             }
             // Insert the new home
             String insertQuery = "REPLACE INTO homes (player_uuid_and_name, player_uuid, home_name, world_uuid, location_x, location_y, " +
-                    "location_z, pitch, yaw) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "location_z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
                 insertStatement.setString(1, player.getUniqueId() + homeName);
                 insertStatement.setString(2, player.getUniqueId().toString());
@@ -187,8 +186,8 @@ public class SQLiteHandler extends SaveHandler {
                 insertStatement.setDouble(5, onlinePlayer.getX());
                 insertStatement.setDouble(6, onlinePlayer.getY());
                 insertStatement.setDouble(7, onlinePlayer.getZ());
-                insertStatement.setFloat(8, onlinePlayer.getPitch());
-                insertStatement.setFloat(9, onlinePlayer.getYaw());
+                insertStatement.setFloat(8, onlinePlayer.getYaw());
+                insertStatement.setFloat(9, onlinePlayer.getPitch());
                 insertStatement.executeUpdate();
             }
             return true; // Home set successfully

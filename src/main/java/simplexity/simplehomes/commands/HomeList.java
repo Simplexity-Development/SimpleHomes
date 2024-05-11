@@ -17,9 +17,9 @@ import simplexity.simplehomes.saving.SQLiteHandler;
 import java.util.List;
 
 public class HomeList implements TabExecutor {
-    
+
     private final MiniMessage miniMessage = SimpleHomes.getMiniMessage();
-    
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
@@ -56,7 +56,7 @@ public class HomeList implements TabExecutor {
         player.sendMessage(messageToSend);
         return true;
     }
-    
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         return null;

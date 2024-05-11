@@ -2,22 +2,30 @@ package simplexity.simplehomes;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockSupport;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.*;
+import org.bukkit.block.data.type.Campfire;
+import org.bukkit.block.data.type.Fire;
 
 import java.util.List;
 
 public class SafetyCheck {
 
-    public static boolean teleportingUnderWater(Location location) {
+    /**
+     * Checks if the block above this location is water
+     * @param location the location to check
+     * @return boolean
+     */
+    public static boolean underWater(Location location) {
         Location locationAbove = location.clone().add(0, 1, 0);
         return locationAbove.getBlock().getType() == Material.WATER;
     }
 
-    public static boolean teleportingIntoLava(Location location) {
+    /**
+     * Checks if this block or the one above it is lava
+     * @param location the location to check
+     * @return boolean
+     */
+    public static boolean insideLava(Location location) {
         Location locationAbove = location.clone().add(0, 1, 0);
         if (location.getBlock().getType() == Material.LAVA) {
             return true;
@@ -25,64 +33,55 @@ public class SafetyCheck {
         return locationAbove.getBlock().getType() == Material.LAVA;
     }
 
-    public static boolean teleportingIntoVoid(Location location) {
+    /**
+     * Checks if the block below the provided location is air or is otherwise empty
+     * @param location the location to check
+     * @return boolean
+     */
+    public static boolean willFall(Location location) {
         Location locationBelow = location.clone().add(0, -1, 0);
         if (locationBelow.getBlock().isEmpty()) return true;
         if (locationBelow.getBlock().getType().isEmpty()) return true;
         return locationBelow.getBlock().getType().equals(Material.AIR);
     }
 
-    public static boolean teleportingIntoFire(Location location) {
-        Location locationBelow = location.clone().add(0, -1, 0);
-        if (location.getBlock().getBlockData() instanceof Fire) {
+    /**
+     * Checks if the block located at this position is a fire, or campfire
+     * @param location the location to check
+     * @return boolean
+     */
+    public static boolean insideFire(Location location) {
+        BlockData blockData = location.getBlock().getBlockData();
+        if (blockData instanceof Fire) {
             return true;
         }
-        if (locationBelow.getBlock().getBlockData() instanceof Campfire campfire) {
+        if (blockData instanceof Campfire campfire) {
             return campfire.isLit();
         }
         return false;
     }
 
-    public static boolean teleportingIntoSolidBlocks(Location location) {
+    /**
+     * Checks if the block located at this position is solid
+     * @param location the location to check
+     * @return boolean
+     */
+    public static boolean insideSolidBlocks(Location location) {
         Location locationAbove = location.clone().add(0, 1, 0);
         if (locationAbove.getBlock().isSolid()) return true;
-        return location.getBlock().isSolid();
+        return false;
     }
 
-    public static boolean teleportingIntoBlacklistedBlocks(Location location, List<Material> materialList) {
+    /**
+     * Checks if the block located at this position, or the block above, are blacklisted
+     * @param location the location to check
+     * @param materialList the list of blacklisted materials
+     * @return boolean
+     */
+
+    public static boolean insideBlacklistedBlocks(Location location, List<Material> materialList) {
         Location locationAbove = location.clone().add(0, 1, 0);
         if (materialList.contains(locationAbove.getBlock().getType())) return true;
         return materialList.contains(location.getBlock().getType());
     }
-
-    public static boolean isNotGonnaTeleportThemThroughTheFloor(Location location, List<Material> nonFullBlockList){
-        if (!teleportingOntoFullBlock(location, nonFullBlockList)) {
-            return teleportingOntoSturdyBlock(location);
-        } else {
-            return true;
-        }
-    }
-    public static boolean teleportingOntoFullBlock(Location location, List<Material> materialList) {
-        Block block = location.getBlock();
-        BlockData blockData = block.getBlockData();
-        if (blockData instanceof TrapDoor) return false;
-        if (blockData instanceof Slab) return false;
-        if (blockData instanceof Stairs) return false;
-        if (blockData instanceof Wall) return false;
-        if (blockData instanceof Fence) return false;
-        if (blockData instanceof Gate) return false;
-        if (blockData instanceof Chest) return false;
-        if (blockData instanceof Bed) return false;
-        if (blockData instanceof Campfire) return false;
-        if (blockData instanceof Lantern) return false;
-        if (materialList.contains(block.getType())) return false;
-        return true;
-    }
-
-    public static boolean teleportingOntoSturdyBlock(Location location) {
-        Location locationBelow = location.clone().add(0, -1, 0);
-        Block block = locationBelow.getBlock();
-        return block.getBlockData().isFaceSturdy(BlockFace.UP, BlockSupport.FULL);
-    }
-
 }

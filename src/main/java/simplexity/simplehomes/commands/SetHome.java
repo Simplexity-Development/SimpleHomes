@@ -2,7 +2,6 @@ package simplexity.simplehomes.commands;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -11,18 +10,17 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
-import simplexity.simplehomes.SafetyCheck;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.Util;
-import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLiteHandler;
 
 import java.util.List;
 
 public class SetHome implements TabExecutor {
-    
+
     MiniMessage miniMessage = SimpleHomes.getMiniMessage();
+
     // /sethome name
     /*
     /sethome - no args, if it has no home set, will set first home, if it has home, will ask for additional arguments
@@ -53,7 +51,8 @@ public class SetHome implements TabExecutor {
         for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
             String permission = pai.getPermission();
             if (!pai.getValue()) continue;
-            if (permission.length() <= 12 || !permission.startsWith("homes.count.") || permission.equals("homes.count.bypass")) continue;
+            if (permission.length() <= 12 || !permission.startsWith("homes.count.") || permission.equals("homes.count.bypass"))
+                continue;
             try {
                 int homeCount = Integer.parseInt(permission.substring(12));
                 if (maxHomes < homeCount) maxHomes = homeCount;
@@ -70,7 +69,7 @@ public class SetHome implements TabExecutor {
                     Placeholder.unparsed("value", String.valueOf(maxHomes))));
             return false;
         }
-        if (!SQLiteHandler.getInstance().setHome(player, homeName,player, overwrite)) {
+        if (!SQLiteHandler.getInstance().setHome(player, homeName, player, overwrite)) {
             player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
             return false;
         }

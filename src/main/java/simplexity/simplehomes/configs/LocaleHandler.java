@@ -25,7 +25,7 @@ public class LocaleHandler {
     private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome, cannotSetMoreHomes;
     private String insertName, insertWorld, insertXLoc, insertYLoc, insertZLoc, insertOverride;
     private String homeSet, homeDeleted, homeTeleported, pluginReloaded, listHeader, listItem, listNoHomes;
-    private String blacklistedWarning, voidWarning, fireWarning, blocksWarning, lavaWarning, waterWarning, notSolidWarning;
+    private String blacklistedWarning, voidWarning, fireWarning, blocksWarning, lavaWarning, waterWarning;
     private LocaleHandler() {
         if (!localeFile.exists()) {
             SimpleHomes.getInstance().saveResource(fileName, false);
@@ -73,8 +73,6 @@ public class LocaleHandler {
         blocksWarning = localeConfig.getString("warnings.blocks", "<red>Your home is currently encased in blocks</red> ");
         lavaWarning = localeConfig.getString("warnings.lava", "<red>Your home is currently inside of lava</red> ");
         waterWarning = localeConfig.getString("warnings.water", "<red>Your home is currently under water</red> ");
-        notSolidWarning = localeConfig.getString("warnings.not-solid", "<red>Your home is currently not on a solid block</red> ");
-        
     }
     
     
@@ -118,26 +116,6 @@ public class LocaleHandler {
         return pluginReloaded;
     }
     
-    public String getInsertName() {
-        return insertName;
-    }
-    
-    public String getInsertWorld() {
-        return insertWorld;
-    }
-    
-    public String getInsertXLoc() {
-        return insertXLoc;
-    }
-    
-    public String getInsertYLoc() {
-        return insertYLoc;
-    }
-    
-    public String getInsertZLoc() {
-        return insertZLoc;
-    }
-    
     public String getListHeader() {
         return listHeader;
     }
@@ -155,11 +133,11 @@ public class LocaleHandler {
         Component worldComponent = miniMessage.deserialize(insertWorld,
                 Placeholder.unparsed("world", home.location().getWorld().getName()));
         Component xComponent = miniMessage.deserialize(insertXLoc,
-                Placeholder.unparsed("x-loc", String.valueOf(home.location().getX())));
+                Placeholder.unparsed("x-loc", String.valueOf(home.location().getBlockX())));
         Component yComponent = miniMessage.deserialize(insertYLoc,
-                Placeholder.unparsed("y-loc", String.valueOf(home.location().getY())));
+                Placeholder.unparsed("y-loc", String.valueOf(home.location().getBlockY())));
         Component zComponent = miniMessage.deserialize(insertZLoc,
-                Placeholder.unparsed("z-loc", String.valueOf(home.location().getZ())));
+                Placeholder.unparsed("z-loc", String.valueOf(home.location().getBlockZ())));
         return miniMessage.deserialize(message,
                 Placeholder.component("name", nameComponent),
                 Placeholder.component("world", worldComponent),
@@ -198,9 +176,5 @@ public class LocaleHandler {
 
     public String getInsertOverride() {
         return insertOverride;
-    }
-
-    public String getNotSolidWarning() {
-        return notSolidWarning;
     }
 }

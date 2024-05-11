@@ -20,6 +20,7 @@ import java.util.List;
 
 public class DeleteHome implements TabExecutor {
     MiniMessage miniMessage = SimpleHomes.getMiniMessage();
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
@@ -51,7 +52,7 @@ public class DeleteHome implements TabExecutor {
         }
         return false;
     }
-    
+
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (args.length < 2 && sender instanceof Player player) {
@@ -63,6 +64,6 @@ public class DeleteHome implements TabExecutor {
         }
         return null;
     }
-    
-    
+
+
 }
