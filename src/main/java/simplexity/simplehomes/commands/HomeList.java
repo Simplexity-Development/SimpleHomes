@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.configs.LocaleHandler;
-import simplexity.simplehomes.saving.SQLiteHandler;
+import simplexity.simplehomes.saving.SQLHandler;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class HomeList implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
+        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player);
         Component messageToSend = miniMessage.deserialize(LocaleHandler.getInstance().getListHeader());
         if (playerHomes.isEmpty()) {
             messageToSend = messageToSend
@@ -45,7 +45,7 @@ public class HomeList implements TabExecutor {
             return true;
         }
         String homeName = args[0];
-        Home home = SQLiteHandler.getInstance().getHome(player, homeName);
+        Home home = SQLHandler.getInstance().getHome(player, homeName);
         Component listComponent = LocaleHandler.getInstance().locationResolver(home, LocaleHandler.getInstance().getListItem());
         if (listComponent == null) {
             player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeNotFound(),

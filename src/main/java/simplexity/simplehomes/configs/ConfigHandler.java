@@ -12,7 +12,8 @@ public class ConfigHandler {
     private static ConfigHandler instance;
 
     private final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
-    private boolean creativeBypass, invulnerableBypass;
+    private boolean creativeBypass, invulnerableBypass, mysql;
+    private String ip, name, username, password;
 
     public static ConfigHandler getInstance() {
         if (instance == null) instance = new ConfigHandler();
@@ -26,6 +27,11 @@ public class ConfigHandler {
         creativeBypass = config.getBoolean("safety-bypass.creative");
         invulnerableBypass = config.getBoolean("safety-bypass.invulnerable");
         fillList(blockList, blacklistedBlocks);
+        mysql = config.getBoolean("mysql.enabled");
+        ip = config.getString("mysql.ip");
+        name = config.getString("mysql.name");
+        username = config.getString("mysql.username");
+        password = config.getString("mysql.password");
     }
 
     private void fillList(List<String> stringList, ArrayList<Material> materialList) {
@@ -51,5 +57,25 @@ public class ConfigHandler {
 
     public boolean doInvulnerableBypass() {
         return invulnerableBypass;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean isUsingMysql() {
+        return mysql;
     }
 }

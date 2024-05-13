@@ -5,6 +5,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
+import simplexity.simplehomes.configs.ConfigHandler;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,21 +19,25 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
- public class SQLiteHandler extends SaveHandler {
-    
+public class SQLHandler extends SaveHandler {
+
     Connection connection;
     Logger logger = SimpleHomes.getInstance().getLogger();
-    private SQLiteHandler(){}
-    private static SQLiteHandler instance;
-    public static SQLiteHandler getInstance() {
-        if (instance == null) instance = new SQLiteHandler();
+
+    private SQLHandler() {
+    }
+
+    private static SQLHandler instance;
+
+    public static SQLHandler getInstance() {
+        if (instance == null) instance = new SQLHandler();
         return instance;
     }
-    
+
     @Override
     public void init() {
         try {
-            connection = DriverManager.getConnection("jdbc:sqlite:" + SimpleHomes.getInstance().getDataFolder() + "/homes.db");
+            connection = sqlOrSqlLite();
             try (Statement statement = connection.createStatement()) {
                 statement.execute("""
                         CREATE TABLE IF NOT EXISTS homes (
@@ -48,14 +53,14 @@ import java.util.logging.Logger;
                         pitch FLOAT
                         );""");
             }
-            
+
         } catch (SQLException e) {
             logger.severe("Failed to connect to SQLite database");
             logger.severe("Error: " + e.getMessage());
             logger.severe(Arrays.toString(e.getStackTrace()));
         }
     }
-    
+
     @Override
     public List<Home> getHomes(OfflinePlayer player) {
         List<Home> homes = new ArrayList<>();
@@ -91,7 +96,7 @@ import java.util.logging.Logger;
         }
         return null;
     }
-    
+
     @Override
     public Home getHome(OfflinePlayer player, String homeName) {
         try {
@@ -128,7 +133,7 @@ import java.util.logging.Logger;
         }
         return null;
     }
-    
+
     @Override
     public boolean deleteHome(OfflinePlayer player, String homeName) {
         try {
@@ -156,17 +161,17 @@ import java.util.logging.Logger;
         }
         return false;
     }
-    
+
     @Override
     public boolean setHome(OfflinePlayer player, String homeName, Player onlinePlayer, boolean overwrite) {
         try {
             // Prepare the SQL statement to check if the home exists
             String checkIfExistsQuery = "SELECT COUNT(*) AS count FROM homes WHERE player_uuid = ? AND home_name = ?";
-            
+
             try (PreparedStatement homeExists = connection.prepareStatement(checkIfExistsQuery)) {
                 homeExists.setString(1, player.getUniqueId().toString());
                 homeExists.setString(2, homeName);
-                
+
                 try (ResultSet resultSet = homeExists.executeQuery()) {
                     if (resultSet.getInt("count") > 0) { // Home exists
                         if (!overwrite) {
@@ -197,5 +202,12 @@ import java.util.logging.Logger;
             return false; // Error occurred while setting home
         }
     }
-    
+
+    private Connection sqlOrSqlLite() throws SQLException {
+        if (ConfigHandler.getInstance().isUsingMysql()) {
+            return DriverManager.getConnection("jdbc:mysql://" + ConfigHandler.getInstance().getIp() + "/" + ConfigHandler.getInstance().getName(), ConfigHandler.getInstance().getUsername(), ConfigHandler.getInstance().getPassword());
+        } else {
+            return DriverManager.getConnection("jdbc:sqlite:" + SimpleHomes.getInstance().getDataFolder() + "/homes.db");
+        }
+    }
 }

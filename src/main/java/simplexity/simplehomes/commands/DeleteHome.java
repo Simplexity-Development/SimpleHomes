@@ -13,7 +13,7 @@ import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.Util;
 import simplexity.simplehomes.configs.LocaleHandler;
-import simplexity.simplehomes.saving.SQLiteHandler;
+import simplexity.simplehomes.saving.SQLHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +31,10 @@ public class DeleteHome implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
             return false;
         }
-        List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
+        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player);
         String homeName = args[0].toLowerCase();
         if (Util.homeExists(playerHomes, homeName)) {
-            Home home = SQLiteHandler.getInstance().getHome(player, homeName);
+            Home home = SQLHandler.getInstance().getHome(player, homeName);
             if (home == null) {
                 SimpleHomes.getInstance().getLogger().severe("HOME WAS NULL, RETURNING");
                 return false;
@@ -44,7 +44,7 @@ public class DeleteHome implements TabExecutor {
                 SimpleHomes.getInstance().getLogger().warning("Unable to load 'messages.home-deleted' from locale.yml, please check your locale");
                 messageToSend = miniMessage.deserialize("<yellow>Home was deleted></yellow>");
             }
-            SQLiteHandler.getInstance().deleteHome(player, homeName);
+            SQLHandler.getInstance().deleteHome(player, homeName);
             player.sendMessage(messageToSend);
         } else {
             player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeNotFound(),
@@ -57,7 +57,7 @@ public class DeleteHome implements TabExecutor {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (args.length < 2 && sender instanceof Player player) {
             List<String> homeList = new ArrayList<>();
-            for (Home home : SQLiteHandler.getInstance().getHomes(player)) {
+            for (Home home : SQLHandler.getInstance().getHomes(player)) {
                 homeList.add(home.name());
             }
             return homeList;

@@ -13,7 +13,7 @@ import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.Util;
 import simplexity.simplehomes.configs.LocaleHandler;
-import simplexity.simplehomes.saving.SQLiteHandler;
+import simplexity.simplehomes.saving.SQLHandler;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class SetHome implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLiteHandler.getInstance().getHomes(player);
+        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player);
         if (args.length < 1 && !playerHomes.isEmpty()) {
             sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
             return false;
@@ -69,7 +69,7 @@ public class SetHome implements TabExecutor {
                     Placeholder.unparsed("value", String.valueOf(maxHomes))));
             return false;
         }
-        if (!SQLiteHandler.getInstance().setHome(player, homeName, player, overwrite)) {
+        if (!SQLHandler.getInstance().setHome(player, homeName, player, overwrite)) {
             player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
             return false;
         }

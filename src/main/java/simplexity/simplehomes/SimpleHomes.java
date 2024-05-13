@@ -9,12 +9,13 @@ import simplexity.simplehomes.commands.HomesReload;
 import simplexity.simplehomes.commands.SetHome;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
-import simplexity.simplehomes.saving.SQLiteHandler;
+import simplexity.simplehomes.saving.SQLHandler;
 
 public final class SimpleHomes extends JavaPlugin {
 
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
     private static SimpleHomes instance;
+
 
 
     @Override
@@ -23,7 +24,7 @@ public final class SimpleHomes extends JavaPlugin {
         saveDefaultConfig();
         ConfigHandler.getInstance().loadConfigValues();
         LocaleHandler.getInstance().loadLocale();
-        SQLiteHandler.getInstance().init();
+        SQLHandler.getInstance().init();
         registerCommands();
     }
 
