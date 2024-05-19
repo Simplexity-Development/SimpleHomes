@@ -2,21 +2,23 @@ name: SimpleHomes
 version: '${project.version}'
 main: simplexity.simplehomes.SimpleHomes
 api-version: '1.20'
+author: RhythmicSys
+description: A basic plugin for setting and teleporting to locations
 commands:
   sethome:
-    permission: homes.sethome
+    permission: homes.commands.sethome
     description: Sets a home
   delhome:
-    permission: homes.delhome
+    permission: homes.commands.delhome
     description: Deletes a home
   home:
-    permission: homes.teleport
+    permission: homes.commands.home
     description: Teleports to a home
   homesreload:
     permission: homes.reload
     description: reloads the config
   homelist:
-    permission: homes.list
+    permission: homes.commands.list
     description: lists your homes
 permissions:
   homes:
@@ -28,21 +30,34 @@ permissions:
   homes.commands.sethome:
     default: op
     description: allows player to set home
+    children:
+      homes.commands: true
   homes.commands.delhome:
     default: op
     description: allows player to delete home
+    children:
+      homes.commands: true
+  homes.commands.home:
+    default: op
+    description: allows player to teleport to home
+    children:
+      homes.commands: true
   homes.count:
     default: op
     description: base for permission on number of homes you can have
   homes.count.bypass:
     default: op
     description: allows for setting infinite homes regardless of how many you have set as the max
+    children:
+      homes.count: true
   homes.reload:
     default: op
     description: allows reloading the config
-  homes.list:
+  homes.commands.list:
     default: op
     description: allows you to list your own homes
+    children:
+      homes.commands: true
   homes.safety.bypass:
     default: false
     description: allows bypassing the safety checks
