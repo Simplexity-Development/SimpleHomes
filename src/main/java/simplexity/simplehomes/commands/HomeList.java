@@ -11,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
+import simplexity.simplehomes.Util;
+import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLHandler;
 
@@ -27,6 +29,15 @@ public class HomeList implements TabExecutor {
             return false;
         }
         List<Home> playerHomes = SQLHandler.getInstance().getHomes(player);
+        if (ConfigHandler.getInstance().isLockoutEnabled() && ConfigHandler.getInstance().isDisableHomeList()) {
+            int maxHomeCount = Util.maxHomesPermission(player);
+            if (maxHomeCount < playerHomes.size() && !player.hasPermission("homes.count.bypass")) {
+                player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getCannotUseCommand(),
+                        Placeholder.parsed("value", String.valueOf(maxHomeCount)),
+                        Placeholder.parsed("command", "/homelist")));
+                return false;
+            }
+        }
         Component messageToSend = miniMessage.deserialize(LocaleHandler.getInstance().getListHeader());
         if (playerHomes.isEmpty()) {
             messageToSend = messageToSend

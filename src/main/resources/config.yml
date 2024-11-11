@@ -12,3 +12,10 @@ blacklisted-blocks:
 safety-bypass:
   creative: true
   invulnerable: true
+# Should people be prevented from using homes they set before their permissions were adjusted to be lower? (i.e. they
+# had permission to set 5 homes before, and now they only have permission to set 3)
+lockout:
+  enabled: false
+  home: true
+  homelist: false
+  deletehome: false #dunno why you'd enable this unless you want people to be completely locked out but okay

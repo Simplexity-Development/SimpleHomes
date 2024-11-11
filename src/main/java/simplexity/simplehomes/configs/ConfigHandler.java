@@ -12,7 +12,8 @@ public class ConfigHandler {
     private static ConfigHandler instance;
 
     private final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
-    private boolean creativeBypass, invulnerableBypass, mysql;
+    private boolean creativeBypass, invulnerableBypass, mysql, lockoutEnabled, disableHome, disableHomeList,
+            disableDeleteHome;
     private String ip, name, username, password;
 
     public static ConfigHandler getInstance() {
@@ -24,8 +25,12 @@ public class ConfigHandler {
         SimpleHomes.getInstance().reloadConfig();
         FileConfiguration config = SimpleHomes.getInstance().getConfig();
         List<String> blockList = config.getStringList("blacklisted-blocks");
-        creativeBypass = config.getBoolean("safety-bypass.creative");
-        invulnerableBypass = config.getBoolean("safety-bypass.invulnerable");
+        creativeBypass = config.getBoolean("safety-bypass.creative", true);
+        invulnerableBypass = config.getBoolean("safety-bypass.invulnerable", true);
+        lockoutEnabled = config.getBoolean("lockout.enabled", false);
+        disableHome = config.getBoolean("lockout.home", false);
+        disableHomeList = config.getBoolean("lockout.homelist", false);
+        disableDeleteHome = config.getBoolean("lockout.deletehome", false);
         fillList(blockList, blacklistedBlocks);
         mysql = config.getBoolean("mysql.enabled");
         ip = config.getString("mysql.ip");
@@ -77,5 +82,21 @@ public class ConfigHandler {
 
     public boolean isUsingMysql() {
         return mysql;
+    }
+
+    public boolean isLockoutEnabled() {
+        return lockoutEnabled;
+    }
+
+    public boolean isDisableHome() {
+        return disableHome;
+    }
+
+    public boolean isDisableHomeList() {
+        return disableHomeList;
+    }
+
+    public boolean isDisableDeleteHome() {
+        return disableDeleteHome;
     }
 }

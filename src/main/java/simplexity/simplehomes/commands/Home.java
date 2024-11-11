@@ -35,6 +35,15 @@ public class Home implements TabExecutor {
             return false;
         }
         List<simplexity.simplehomes.Home> playerHomes = SQLHandler.getInstance().getHomes(player);
+        if (ConfigHandler.getInstance().isLockoutEnabled() && ConfigHandler.getInstance().isDisableHome()) {
+            int maxHomeCount = Util.maxHomesPermission(player);
+            if (maxHomeCount < playerHomes.size() && !player.hasPermission("homes.count.bypass")) {
+                player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getCannotUseCommand(),
+                        Placeholder.parsed("value", String.valueOf(maxHomeCount)),
+                        Placeholder.parsed("command", "/home")));
+                return false;
+            }
+        }
         String homeName = args[0].toLowerCase();
         simplexity.simplehomes.Home home = null;
         if (Util.homeExists(playerHomes, homeName)) {
