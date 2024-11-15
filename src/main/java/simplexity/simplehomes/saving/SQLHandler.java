@@ -178,7 +178,7 @@ public class SQLHandler extends SaveHandler {
                 homeExists.setString(2, homeName);
 
                 try (ResultSet resultSet = homeExists.executeQuery()) {
-                    if (resultSet.getInt("count") > 0) { // Home exists
+                    if (resultSet.next() && resultSet.getInt("count") > 0) { // Home exists
                         if (!overwrite) {
                             return false; // Don't overwrite, return false
                         }
