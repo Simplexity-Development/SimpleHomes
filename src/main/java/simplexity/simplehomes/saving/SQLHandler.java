@@ -57,7 +57,7 @@ public class SQLHandler extends SaveHandler {
         } catch (SQLException e) {
             logger.severe("Failed to connect to SQLite database");
             logger.severe("Error: " + e.getMessage());
-            logger.severe(Arrays.toString(e.getStackTrace()));
+            e.printStackTrace();
         }
     }
 
@@ -88,11 +88,13 @@ public class SQLHandler extends SaveHandler {
                 } catch (SQLException e) {
                     logger.severe("Failed to get homes for " + player);
                     logger.severe("Error: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         } catch (SQLException e) {
             logger.severe("Failed to get homes for " + player);
             logger.severe("Error: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -125,11 +127,13 @@ public class SQLHandler extends SaveHandler {
                 } catch (SQLException e) {
                     logger.severe("Failed to get home for " + player);
                     logger.severe("Error: " + e.getMessage());
+                    e.printStackTrace();
                 }
             }
         } catch (SQLException e) {
             logger.severe("Failed to get home for " + player);
             logger.severe("Error: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -157,6 +161,7 @@ public class SQLHandler extends SaveHandler {
             }
         } catch (SQLException e) {
             logger.severe("Failed to delete home for " + player);
+            e.printStackTrace();
             return false; // Error occurred while setting home
         }
         return false;
@@ -199,6 +204,7 @@ public class SQLHandler extends SaveHandler {
         } catch (SQLException e) {
             logger.severe("Failed to set home for " + player);
             logger.severe("Error: " + e.getMessage());
+            e.printStackTrace();
             return false; // Error occurred while setting home
         }
     }
