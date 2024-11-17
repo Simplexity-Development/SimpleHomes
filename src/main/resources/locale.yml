@@ -31,3 +31,46 @@ warnings:
   blocks: "<red>Your home is currently encased in blocks</red> "
   lava: "<red>Your home is currently inside of lava</red> "
   water: "<red>Your home is currently under water</red> "
+console:
+  unsupported-destructive: |
+    <reset>------------------------------------------------------------------------
+    <gold>You are about to run: <yellow>/<command>
+    
+    <red><bold>THIS ACTION IS DESTRUCTIVE AND WILL OVERWRITE EXISTING HOMES IN SIMPLEHOMES.
+    <red><bold>THIS ACTION IS NOT SUPPORTED AND MAY CORRUPT SAVE DATA, USE AT YOUR OWN RISK.
+    
+    <gold>Please confirm this command using <yellow>/<command> confirm
+    <reset>-----------------------------------------------------------------------------------------
+  import-help: |
+    ------------------Import Homes Help------------------------------------
+    
+    <gold>This command is <red>DESTRUCTIVE</red> and will overwrite homes already set on SimpleHomes
+    <gold>This command is <red>UNSUPPORTED</red> and may <red>CORRUPT SAVE DATA</red>.
+                  <red>>>>>> USE AT YOUR OWN RISK <<<<<</red>.
+    
+    <aqua>Usage:</aqua> <yellow>/importhomes <plugin> [username]
+    <yellow>[username] <aqua>is an optional argument to import specifically that user's homes.
+    
+    <green>Valid Plugins: Essentials
+    
+    <gray>Not all home plugins are supported, to add support submit an issue on GitHub - https://github.com/Simplexity-Development/SimpleHomes/issues 
+    <reset>-----------------------------------------------------------------------------------------
+  import-not-enough-args: |
+    <red>Not enough arguments.</red>
+    <gray>Try <yellow>importhomes help</yellow></gray>
+  only-console: "<red>This command can only be used by the Console."
+  cannot-confirm: "<red>No command was executed recently to confirm."
+  timed-out: "<red>Command timed out, please run again."
+  no-valid-plugin: "<red>No valid plugin was found."
+  import-finished: "<green>Import complete</green>"
+  saved-homes: "<yellow>Imported all homes for <name></yellow>"
+  essentials:
+    not-exist: "<gold>There is no /plugins/Essentials/userdata folder!"
+    nothing-inside: "<gold>There is nothing inside of the /plugins/Essentials/userdata folder."
+    player-not-exist:
+      - "<gold>This player does not exist or does not have an Essentials/userdata file!"
+      - "<yellow>Player Name: </yellow><name>"
+      - "<yellow>Retrieved UUID: </yellow><uuid>"
+      - "<yellow>Searched File: </yellow><file>"
+
+

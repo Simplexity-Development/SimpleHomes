@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 public class LocaleHandler {
-    
+
     private final MiniMessage miniMessage = SimpleHomes.getMiniMessage();
     private static LocaleHandler instance;
     private final String fileName = "locale.yml";
@@ -26,21 +26,24 @@ public class LocaleHandler {
     private String insertName, insertWorld, insertXLoc, insertYLoc, insertZLoc, insertOverride;
     private String homeSet, homeDeleted, homeTeleported, pluginReloaded, listHeader, listItem, listNoHomes;
     private String blacklistedWarning, voidWarning, fireWarning, blocksWarning, lavaWarning, waterWarning;
+    private String unsupportedDestructive, importHelp, importNotEnoughArgs, onlyConsole, cannotConfirm, timedOut, noValidPlugin,
+            essentialsNotExist, nothingInsideFolder, playerNotExist, importComplete, importedHomes;
+
     private LocaleHandler() {
         if (!localeFile.exists()) {
             SimpleHomes.getInstance().saveResource(fileName, false);
         }
     }
-    
+
     public static LocaleHandler getInstance() {
         if (instance == null) instance = new LocaleHandler();
         return instance;
     }
-    
+
     public FileConfiguration getLocaleConfig() {
         return localeConfig;
     }
-    
+
     public void loadLocale() {
         try {
             localeConfig.load(localeFile);
@@ -75,57 +78,96 @@ public class LocaleHandler {
         blocksWarning = localeConfig.getString("warnings.blocks", "<red>Your home is currently encased in blocks</red> ");
         lavaWarning = localeConfig.getString("warnings.lava", "<red>Your home is currently inside of lava</red> ");
         waterWarning = localeConfig.getString("warnings.water", "<red>Your home is currently under water</red> ");
+        unsupportedDestructive = localeConfig.getString("console.unsupported-destructive", """
+                <reset>------------------------------------------------------------------------
+                <gold>You are about to run: <yellow>/<command>
+                
+                <red><bold>THIS ACTION IS DESTRUCTIVE AND WILL OVERWRITE EXISTING HOMES IN SIMPLEHOMES.
+                <red><bold>THIS ACTION IS NOT SUPPORTED AND MAY CORRUPT SAVE DATA, USE AT YOUR OWN RISK.
+                
+                <gold>Please confirm this command using <yellow>/<command> confirm
+                <reset>-----------------------------------------------------------------------------------------""");
+        importHelp = localeConfig.getString("console.import-help", """
+                ------------------Import Homes Help------------------------------------
+                
+                <gold>This command is <red>DESTRUCTIVE</red> and will overwrite homes already set on SimpleHomes
+                <gold>This command is <red>UNSUPPORTED</red> and may <red>CORRUPT SAVE DATA</red>.
+                              <red>>>>>> USE AT YOUR OWN RISK <<<<<</red>.
+                
+                <aqua>Usage:</aqua> <yellow>/importhomes <plugin> [username]
+                <yellow>[username] <aqua>is an optional argument to import specifically that user's homes.
+                
+                <green>Valid Plugins: Essentials
+                
+                <gray>Not all home plugins are supported, to add support submit an issue on GitHub - https://github.com/Simplexity-Development/SimpleHomes/issues
+                <reset>-----------------------------------------------------------------------------------------""");
+        importNotEnoughArgs = localeConfig.getString("console.import-not-enough-args", """
+                <red>Not enough arguments.</red>
+                <gray>Try <yellow>importhomes help</yellow></gray>""");
+        onlyConsole = localeConfig.getString("console.only-console", "<red>This command can only be used by the Console.");
+        cannotConfirm = localeConfig.getString("console.cannot-confirm", "<red>No command was executed recently to confirm.");
+        timedOut = localeConfig.getString("console.timed-out", "<red>Command timed out, please run again.");
+        noValidPlugin = localeConfig.getString("console.no-valid-plugin", "<red>No valid plugin was found.");
+        essentialsNotExist = localeConfig.getString("console.essentials.not-exist", "<gold>There is no /plugins/Essentials/userdata folder!");
+        nothingInsideFolder = localeConfig.getString("console.essentials.nothing-inside", "<gold>There is nothing inside of the /plugins/Essentials/userdata folder.");
+        playerNotExist = localeConfig.getString("console.essentials.player-not-exist", """
+                <gold>This player does not exist or does not have an Essentials/userdata file!");
+                <yellow>Player Name: </yellow><name>
+                <yellow>Retrieved UUID: </yellow><uuid>
+                <yellow>Searched File: </yellow><file>""");
+        importComplete = localeConfig.getString("console.import-finished", "<green>Import complete</green>");
+        importedHomes = localeConfig.getString("console.saved-homes", "<yellow>Imported all homes for <name></yellow>");
     }
-    
-    
+
+
     public String getMustBePlayer() {
         return mustBePlayer;
     }
-    
+
     public String getProvideHomeName() {
         return provideHomeName;
     }
-    
+
     public String getHomeNotFound() {
         return homeNotFound;
     }
-    
+
     public String getHomeExists() {
         return homeAlreadyExists;
     }
-    
+
     public String getNullHome() {
         return nullHome;
     }
-    
+
     public String getHomeSet() {
         return homeSet;
     }
-    
+
     public String getHomeDeleted() {
         return homeDeleted;
     }
-    
+
     public String getHomeTeleported() {
         return homeTeleported;
     }
-    
+
     public String getCannotSetMoreHomes() {
         return cannotSetMoreHomes;
     }
-    
+
     public String getPluginReloaded() {
         return pluginReloaded;
     }
-    
+
     public String getListHeader() {
         return listHeader;
     }
-    
+
     public String getListItem() {
         return listItem;
     }
-    
+
     public Component locationResolver(Home home, String message) {
         if (home == null) {
             return null;
@@ -147,7 +189,7 @@ public class LocaleHandler {
                 Placeholder.component("y-loc", yComponent),
                 Placeholder.component("z-loc", zComponent));
     }
-    
+
     public String getListNoHomes() {
         return listNoHomes;
     }
@@ -186,5 +228,54 @@ public class LocaleHandler {
 
     public String getErrorHasOccurred() {
         return errorHasOccurred;
+    }
+
+    public String getUnsupportedDestructive() {
+        return unsupportedDestructive;
+    }
+
+    public String getImportHelp() {
+        return importHelp;
+    }
+
+    public String getImportNotEnoughArgs() {
+        return importNotEnoughArgs;
+    }
+
+    public String getOnlyConsole() {
+        return onlyConsole;
+    }
+
+    public String getCannotConfirm() {
+        return cannotConfirm;
+    }
+
+    public String getTimedOut() {
+        return timedOut;
+    }
+
+    public String getNoValidPlugin() {
+        return noValidPlugin;
+    }
+
+
+    public String getPlayerNotExist() {
+        return playerNotExist;
+    }
+
+    public String getNothingInsideFolder() {
+        return nothingInsideFolder;
+    }
+
+    public String getEssentialsNotExist() {
+        return essentialsNotExist;
+    }
+
+    public String getImportComplete() {
+        return importComplete;
+    }
+
+    public String getImportedHomes() {
+        return importedHomes;
     }
 }

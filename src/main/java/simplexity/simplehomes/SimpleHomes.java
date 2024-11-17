@@ -8,6 +8,8 @@ import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLHandler;
 
+import java.util.Objects;
+
 public final class SimpleHomes extends JavaPlugin {
 
     private static final MiniMessage miniMessage = MiniMessage.miniMessage();
@@ -39,11 +41,11 @@ public final class SimpleHomes extends JavaPlugin {
     }
 
     private void registerCommands() {
-        this.getCommand("sethome").setExecutor(new SetHome());
-        this.getCommand("delhome").setExecutor(new DeleteHome());
-        this.getCommand("home").setExecutor(new Home());
-        this.getCommand("homelist").setExecutor(new HomeList());
-        this.getCommand("homesreload").setExecutor(new HomesReload());
-        this.getCommand("importhomes").setExecutor(new ImportHomes()); // TODO: Add command into plugin.yml
+        Objects.requireNonNull(this.getCommand("sethome")).setExecutor(new SetHome());
+        Objects.requireNonNull(this.getCommand("delhome")).setExecutor(new DeleteHome());
+        Objects.requireNonNull(this.getCommand("home")).setExecutor(new Home());
+        Objects.requireNonNull(this.getCommand("homelist")).setExecutor(new HomeList());
+        Objects.requireNonNull(this.getCommand("homesreload")).setExecutor(new HomesReload());
+        Objects.requireNonNull(this.getCommand("importhomes")).setExecutor(new ImportHomes());
     }
 }

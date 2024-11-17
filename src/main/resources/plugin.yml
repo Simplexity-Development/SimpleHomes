@@ -21,6 +21,7 @@ commands:
     permission: homes.commands.list
     description: lists your homes
   importhomes:
+    permission: homes.import
     description: Console only command for importing from other plugins.
 permissions:
   homes:
@@ -63,3 +64,6 @@ permissions:
   homes.safety.bypass:
     default: false
     description: allows bypassing the safety checks
+  homes.import:
+    default: op
+    description: this permission does nothing outside of prevent this command from being shown to players, granting the permission to someone will still not allow them to run the command
