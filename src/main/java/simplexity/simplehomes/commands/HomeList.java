@@ -28,7 +28,7 @@ public class HomeList implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player);
+        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
         if (ConfigHandler.getInstance().isLockoutEnabled() && ConfigHandler.getInstance().isDisableHomeList()) {
             int maxHomeCount = Util.maxHomesPermission(player);
             if (maxHomeCount < playerHomes.size() && !player.hasPermission("homes.count.bypass")) {
@@ -56,7 +56,7 @@ public class HomeList implements TabExecutor {
             return true;
         }
         String homeName = args[0];
-        Home home = SQLHandler.getInstance().getHome(player, homeName);
+        Home home = SQLHandler.getInstance().getHome(player.getUniqueId(), homeName);
         Component listComponent = LocaleHandler.getInstance().locationResolver(home, LocaleHandler.getInstance().getListItem());
         if (listComponent == null) {
             player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeNotFound(),

@@ -34,7 +34,7 @@ public class Home implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
             return false;
         }
-        List<simplexity.simplehomes.Home> playerHomes = SQLHandler.getInstance().getHomes(player);
+        List<simplexity.simplehomes.Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
         if (ConfigHandler.getInstance().isLockoutEnabled() && ConfigHandler.getInstance().isDisableHome()) {
             int maxHomeCount = Util.maxHomesPermission(player);
             if (maxHomeCount < playerHomes.size() && !player.hasPermission("homes.count.bypass")) {
@@ -47,7 +47,7 @@ public class Home implements TabExecutor {
         String homeName = args[0].toLowerCase();
         simplexity.simplehomes.Home home = null;
         if (Util.homeExists(playerHomes, homeName)) {
-            home = SQLHandler.getInstance().getHome(player, homeName);
+            home = SQLHandler.getInstance().getHome(player.getUniqueId(), homeName);
         }
         if (home == null) {
             player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getNullHome(), Placeholder.parsed("name", homeName)));
@@ -151,7 +151,7 @@ public class Home implements TabExecutor {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
         if (args.length < 2 && sender instanceof Player player) {
             List<String> homeList = new ArrayList<>();
-            for (simplexity.simplehomes.Home home : SQLHandler.getInstance().getHomes(player)) {
+            for (simplexity.simplehomes.Home home : SQLHandler.getInstance().getHomes(player.getUniqueId())) {
                 homeList.add(home.name());
             }
             return homeList;

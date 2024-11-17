@@ -6,6 +6,7 @@ errors:
   null-home: "<red>Home '<name>' does not exist</red>"
   cannot-set-more-homes: "<red>You have already set <dark_red><bold><value></bold></dark_red> homes- you cannot set any more. Delete one of your current homes to set a new one.</red>"
   cannot-use-command: "<red>You currently have more than <dark_red><bold><value></bold></dark_red> homes. In order to use <gray><command></gray> you must first delete some homes.</red>"
+  error-has-occurred: "<red>An error has occurred while running this command. Please contact the server staff to let them know (-SimpleHomes Plugin)</red>"
 # for the inserts, please keep the word inside of angle brackets, or it won't work properly
 # such as 'world: <world>' -
 inserts:

@@ -33,31 +33,27 @@ public class SetHome implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player);
+        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
         if (args.length < 1 && !playerHomes.isEmpty()) {
             sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
             return false;
         }
-        boolean overwrite = false;
-        if (args.length > 1) {
-            if (args[1].equalsIgnoreCase("-o")) {
-                overwrite = true;
-            }
-        }
+        boolean overwrite = args.length > 1 && args[1].equalsIgnoreCase("-o");
         String homeName = args[0].toLowerCase();
+        boolean homeExists = Util.homeExists(playerHomes, homeName);
         int currentHomes = playerHomes.size();
         int maxHomes = Util.maxHomesPermission(player);
-        if (!player.hasPermission("homes.count.bypass") && currentHomes >= maxHomes && !overwrite) {
-            if (Util.homeExists(playerHomes, homeName)) {
-                player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
-                return false;
-            }
+        if (homeExists && !overwrite) {
+            player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
+            return false;
+        }
+        if (!(player.hasPermission("homes.count.bypass") || currentHomes < maxHomes)) {
             player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getCannotSetMoreHomes(),
                     Placeholder.unparsed("value", String.valueOf(maxHomes))));
             return false;
         }
-        if (!SQLHandler.getInstance().setHome(player, homeName, player, overwrite)) {
-            player.sendRichMessage(LocaleHandler.getInstance().getHomeExists());
+        if (!SQLHandler.getInstance().setHome(player.getUniqueId(), player.getLocation(), homeName)) {
+            player.sendRichMessage(LocaleHandler.getInstance().getErrorHasOccurred());
             return false;
         }
         player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getHomeSet(),

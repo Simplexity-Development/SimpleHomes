@@ -1,5 +1,6 @@
 package simplexity.simplehomes.saving;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -14,12 +15,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class SQLHandler extends SaveHandler {
+public class SQLHandler {
 
     Connection connection;
     Logger logger = SimpleHomes.getInstance().getLogger();
@@ -34,7 +34,7 @@ public class SQLHandler extends SaveHandler {
         return instance;
     }
 
-    @Override
+
     public void init() {
         try {
             connection = sqlOrSqlLite();
@@ -61,12 +61,12 @@ public class SQLHandler extends SaveHandler {
         }
     }
 
-    @Override
-    public List<Home> getHomes(OfflinePlayer player) {
+
+    public List<Home> getHomes(UUID uuid) {
         List<Home> homes = new ArrayList<>();
         String query = "SELECT * FROM homes WHERE player_uuid = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, player.getUniqueId().toString());
+            statement.setString(1, uuid.toString());
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     String worldUUIDString = resultSet.getString("world_uuid");
@@ -84,29 +84,24 @@ public class SQLHandler extends SaveHandler {
                     ));
                 }
                 return homes;
-            }
-            catch (SQLException e) {
-                logger.severe("Failed to get homes for " + player);
+            } catch (SQLException e) {
+                logger.severe("Failed to get homes");
                 logger.severe("Error occurred at Home Result.");
-                logger.severe("Error: " + e.getMessage());
                 e.printStackTrace();
             }
-        }
-        catch (SQLException e) {
-            logger.severe("Failed to get homes for " + player);
+        } catch (SQLException e) {
+            logger.severe("Failed to get homes");
             logger.severe("Error occurred at Home Checking.");
-            logger.severe("Error: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
     }
 
-    @Override
-    public Home getHome(OfflinePlayer player, String homeName) {
+    public Home getHome(UUID uuid, String homeName) {
         // Prepare the SQL statement to check if the home exists
         String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
         try (PreparedStatement homeExists = connection.prepareStatement(checkIfExistsQuery)) {
-            homeExists.setString(1, player.getUniqueId().toString());
+            homeExists.setString(1, uuid.toString());
             homeExists.setString(2, homeName);
             try (ResultSet resultSet = homeExists.executeQuery()) {
                 if (resultSet.next()) {
@@ -126,90 +121,62 @@ public class SQLHandler extends SaveHandler {
                 }
                 return null;
             } catch (SQLException e) {
-                logger.severe("Failed to get home for " + player);
+                logger.severe("Failed to get home");
                 logger.severe("Error occurred at Home Result.");
-                logger.severe("Error: " + e.getMessage());
                 e.printStackTrace();
             }
-        }
-        catch (SQLException e) {
-            logger.severe("Failed to get home for " + player);
+        } catch (SQLException e) {
+            logger.severe("Failed to get home");
             logger.severe("Error occurred at Home Checking.");
-            logger.severe("Error: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
     }
 
-    @Override
-    public boolean deleteHome(OfflinePlayer player, String homeName) {
+    public boolean deleteHome(UUID uuid, String homeName) {
         // Prepare the SQL statement to check if the home exists
         String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
         try (PreparedStatement homeExists = connection.prepareStatement(checkIfExistsQuery)) {
-            homeExists.setString(1, player.getUniqueId().toString());
+            homeExists.setString(1, uuid.toString());
             homeExists.setString(2, homeName);
             try (ResultSet resultSet = homeExists.executeQuery()) {
                 if (resultSet.next()) { // Home exists
                     String deleteQuery = "DELETE FROM homes WHERE player_uuid = ? AND home_name = ?";
                     try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
-                        deleteStatement.setString(1, player.getUniqueId().toString());
+                        deleteStatement.setString(1, uuid.toString());
                         deleteStatement.setString(2, homeName);
                         deleteStatement.executeUpdate();
                     }
                 } else {
-                    return false; // Don't overwrite, return false
+                    return false; // Nothing to delete, return false
                 }
             }
-        }
-        catch (SQLException e) {
-            logger.severe("Failed to delete home for " + player);
+        } catch (SQLException e) {
+            logger.severe("Failed to delete home");
             e.printStackTrace();
-            return false; // Error occurred while setting home
+            return false; // Error occurred while deleting home
         }
         return false;
     }
 
-    @Override
-    public boolean setHome(OfflinePlayer player, String homeName, Player onlinePlayer, boolean overwrite) {
-        String statement = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
-
-        try (PreparedStatement homeCheck = connection.prepareStatement(statement)) {
-            homeCheck.setString(1, player.getUniqueId().toString());
-            homeCheck.setString(2, homeName);
-
-            try (ResultSet result = homeCheck.executeQuery()) {
-                if (result.next()) {
-                    if (!overwrite) return false;
-                }
-            }
-        }
-        catch (SQLException e) {
-            logger.severe("Failed to set home for " + player);
-            logger.severe("Error occurred at Home Checking.");
-            logger.severe("Error: " + e.getMessage());
-            e.printStackTrace();
-            return false; // Error occurred while setting home
-        }
-
+    public boolean setHome(UUID uuid, Location location, String homeName) {
         String insertQuery = "REPLACE INTO homes " +
                 "(player_uuid_and_name, player_uuid, home_name, world_uuid, location_x, location_y, location_z, yaw, pitch) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
-            insertStatement.setString(1, player.getUniqueId() + homeName);
-            insertStatement.setString(2, player.getUniqueId().toString());
+            insertStatement.setString(1, uuid + homeName);
+            insertStatement.setString(2, uuid.toString());
             insertStatement.setString(3, homeName);
-            insertStatement.setString(4, String.valueOf(onlinePlayer.getWorld().getUID()));
-            insertStatement.setDouble(5, onlinePlayer.getX());
-            insertStatement.setDouble(6, onlinePlayer.getY());
-            insertStatement.setDouble(7, onlinePlayer.getZ());
-            insertStatement.setFloat(8, onlinePlayer.getYaw());
-            insertStatement.setFloat(9, onlinePlayer.getPitch());
+            insertStatement.setString(4, String.valueOf(location.getWorld().getUID()));
+            insertStatement.setDouble(5, location.getX());
+            insertStatement.setDouble(6, location.getY());
+            insertStatement.setDouble(7, location.getZ());
+            insertStatement.setFloat(8, location.getYaw());
+            insertStatement.setFloat(9, location.getPitch());
             insertStatement.executeUpdate();
-        }
-        catch (SQLException e) {
-            logger.severe("Failed to set home for " + player);
+        } catch (SQLException e) {
+            logger.severe("Failed to set home");
             logger.severe("Error occurred at Home Insert.");
-            logger.severe("Error: " + e.getMessage());
             e.printStackTrace();
             return false; // Error occurred while setting home
         }
