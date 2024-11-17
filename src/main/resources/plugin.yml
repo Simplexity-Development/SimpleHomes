@@ -20,6 +20,8 @@ commands:
   homelist:
     permission: homes.commands.list
     description: lists your homes
+  importhomes:
+    description: Console only command for importing from other plugins.
 permissions:
   homes:
     default: op
