@@ -64,6 +64,9 @@ permissions:
   homes.safety.bypass:
     default: false
     description: allows bypassing the safety checks
+  homes.delay.bypass:
+    default: op
+    description: bypasses the delay for teleportation to homes
   homes.import:
     default: op
     description: this permission does nothing outside of prevent this command from being shown to players, granting the permission to someone will still not allow them to run the command

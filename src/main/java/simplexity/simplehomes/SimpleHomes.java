@@ -6,6 +6,7 @@ import simplexity.simplehomes.commands.*;
 import simplexity.simplehomes.commands.Home;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
+import simplexity.simplehomes.listeners.PlayerMoveListener;
 import simplexity.simplehomes.saving.SQLHandler;
 
 import java.util.Objects;
@@ -24,6 +25,7 @@ public final class SimpleHomes extends JavaPlugin {
         ConfigHandler.getInstance().loadConfigValues();
         LocaleHandler.getInstance().loadLocale();
         SQLHandler.getInstance().init();
+        this.getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
         registerCommands();
     }
 

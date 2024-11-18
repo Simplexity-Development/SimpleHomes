@@ -72,5 +72,7 @@ console:
       - "<yellow>Player Name: </yellow><name>"
       - "<yellow>Retrieved UUID: </yellow><uuid>"
       - "<yellow>Searched File: </yellow><file>"
-
+delay:
+  please-wait: "<green>Teleporting! Please wait <value> seconds!</green>"
+  you-moved: "<gray>You moved, teleportation has been cancelled</gray>"
 

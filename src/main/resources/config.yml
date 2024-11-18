@@ -19,3 +19,8 @@ lockout:
   home: true
   homelist: false
   deletehome: false #dunno why you'd enable this unless you want people to be completely locked out but okay
+delay: # Delay after running the command to teleporting
+  enabled: false
+  time-in-seconds: 5
+  cancel-on-move: true
+  buffer: 0.5

@@ -28,6 +28,7 @@ public class LocaleHandler {
     private String blacklistedWarning, voidWarning, fireWarning, blocksWarning, lavaWarning, waterWarning;
     private String unsupportedDestructive, importHelp, importNotEnoughArgs, onlyConsole, cannotConfirm, timedOut, noValidPlugin,
             essentialsNotExist, nothingInsideFolder, playerNotExist, importComplete, importedHomes;
+    private String pleaseWait, youMoved;
 
     private LocaleHandler() {
         if (!localeFile.exists()) {
@@ -117,6 +118,8 @@ public class LocaleHandler {
                 <yellow>Searched File: </yellow><file>""");
         importComplete = localeConfig.getString("console.import-finished", "<green>Import complete</green>");
         importedHomes = localeConfig.getString("console.saved-homes", "<yellow>Imported all homes for <name></yellow>");
+        pleaseWait = localeConfig.getString("delay.please-wait", "<green>Teleporting! Please wait <value> seconds!</green>");
+        youMoved = localeConfig.getString("delay.you-moved", "<gray>You moved, teleportation has been cancelled</gray>");
     }
 
 
@@ -277,5 +280,13 @@ public class LocaleHandler {
 
     public String getImportedHomes() {
         return importedHomes;
+    }
+
+    public String getPleaseWait() {
+        return pleaseWait;
+    }
+
+    public String getYouMoved() {
+        return youMoved;
     }
 }

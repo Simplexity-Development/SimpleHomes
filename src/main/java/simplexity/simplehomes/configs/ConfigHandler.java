@@ -13,8 +13,10 @@ public class ConfigHandler {
 
     private final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
     private boolean creativeBypass, invulnerableBypass, mysql, lockoutEnabled, disableHome, disableHomeList,
-            disableDeleteHome;
+            disableDeleteHome, delayEnabled, cancelOnMove;
     private String ip, name, username, password;
+    private int timeInSeconds;
+    private double bufferMovement;
 
     public static ConfigHandler getInstance() {
         if (instance == null) instance = new ConfigHandler();
@@ -31,8 +33,12 @@ public class ConfigHandler {
         disableHome = config.getBoolean("lockout.home", false);
         disableHomeList = config.getBoolean("lockout.homelist", false);
         disableDeleteHome = config.getBoolean("lockout.deletehome", false);
+        delayEnabled = config.getBoolean("delay.enabled", false);
+        cancelOnMove = config.getBoolean("delay.cancel-on-move", true);
+        timeInSeconds = config.getInt("delay.time-in-seconds", 5);
+        bufferMovement = config.getDouble("delay.buffer-movement", 0.5);
         fillList(blockList, blacklistedBlocks);
-        mysql = config.getBoolean("mysql.enabled");
+        mysql = config.getBoolean("mysql.enabled", false);
         ip = config.getString("mysql.ip");
         name = config.getString("mysql.name");
         username = config.getString("mysql.username");
@@ -98,5 +104,21 @@ public class ConfigHandler {
 
     public boolean isDisableDeleteHome() {
         return disableDeleteHome;
+    }
+
+    public boolean isDelayEnabled() {
+        return delayEnabled;
+    }
+
+    public boolean isCancelOnMove() {
+        return cancelOnMove;
+    }
+
+    public int getTimeInSeconds() {
+        return timeInSeconds;
+    }
+
+    public double getBufferMovement() {
+        return bufferMovement;
     }
 }
