@@ -53,12 +53,14 @@ permissions:
     description: allows for setting infinite homes regardless of how many you have set as the max
     children:
       homes.count: true
-  homes.reload:
-    default: op
-    description: allows reloading the config
   homes.commands.list:
     default: op
     description: allows you to list your own homes
+    children:
+      homes.commands: true
+  homes.bed:
+    default: op
+    description: sets a home at your bed when you interact with it
     children:
       homes.commands: true
   homes.safety.bypass:
@@ -70,3 +72,6 @@ permissions:
   homes.import:
     default: op
     description: this permission does nothing outside of prevent this command from being shown to players, granting the permission to someone will still not allow them to run the command
+  homes.reload:
+    default: op
+    description: allows reloading the config

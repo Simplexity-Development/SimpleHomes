@@ -2,6 +2,7 @@ package simplexity.simplehomes.configs;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.player.PlayerBedEnterEvent;
 import simplexity.simplehomes.SimpleHomes;
 
 import java.util.ArrayList;
@@ -12,8 +13,9 @@ public class ConfigHandler {
     private static ConfigHandler instance;
 
     private final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
+    private final ArrayList<PlayerBedEnterEvent.BedEnterResult> allowedResults = new ArrayList<>();
     private boolean creativeBypass, invulnerableBypass, mysql, lockoutEnabled, disableHome, disableHomeList,
-            disableDeleteHome, delayEnabled, cancelOnMove;
+            disableDeleteHome, delayEnabled, cancelOnMove, bedHomesEnabled;
     private String ip, name, username, password;
     private int timeInSeconds;
     private double bufferMovement;
@@ -27,6 +29,7 @@ public class ConfigHandler {
         SimpleHomes.getInstance().reloadConfig();
         FileConfiguration config = SimpleHomes.getInstance().getConfig();
         List<String> blockList = config.getStringList("blacklisted-blocks");
+        List<String> resultList = config.getStringList("bed-home.allowed-results");
         creativeBypass = config.getBoolean("safety-bypass.creative", true);
         invulnerableBypass = config.getBoolean("safety-bypass.invulnerable", true);
         lockoutEnabled = config.getBoolean("lockout.enabled", false);
@@ -37,7 +40,9 @@ public class ConfigHandler {
         cancelOnMove = config.getBoolean("delay.cancel-on-move", true);
         timeInSeconds = config.getInt("delay.time-in-seconds", 5);
         bufferMovement = config.getDouble("delay.buffer-movement", 0.5);
-        fillList(blockList, blacklistedBlocks);
+        bedHomesEnabled = config.getBoolean("bed-home.enabled", true);
+        fillList(blockList);
+        verifyEnterEventResults(resultList);
         mysql = config.getBoolean("mysql.enabled", false);
         ip = config.getString("mysql.ip");
         name = config.getString("mysql.name");
@@ -45,21 +50,46 @@ public class ConfigHandler {
         password = config.getString("mysql.password");
     }
 
-    private void fillList(List<String> stringList, ArrayList<Material> materialList) {
-        materialList.clear();
+    private void fillList(List<String> stringList) {
+        blacklistedBlocks.clear();
         for (String string : stringList) {
             Material material = Material.matchMaterial(string);
             if (material == null) {
                 SimpleHomes.getInstance().getLogger().warning(string + " is not a valid material. Please check your config");
                 continue;
             }
-            materialList.add(material);
+            blacklistedBlocks.add(material);
+        }
+    }
+
+    private void verifyEnterEventResults(List<String> stringList) {
+        allowedResults.clear();
+        if (stringList.isEmpty()) {
+            SimpleHomes.getInstance().getLogger().warning(stringList + " is empty. Please check your config, setting default configuration");
+            allowedResults.add(PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_NOW);
+            allowedResults.add(PlayerBedEnterEvent.BedEnterResult.NOT_SAFE);
+            allowedResults.add(PlayerBedEnterEvent.BedEnterResult.OK);
+            return;
+        }
+        for (String string : stringList) {
+            PlayerBedEnterEvent.BedEnterResult result;
+            try {
+                result = PlayerBedEnterEvent.BedEnterResult.valueOf(string);
+            } catch (IllegalArgumentException e) {
+                SimpleHomes.getInstance().getLogger().warning(string + " is not a valid event result, please check your config");
+                continue;
+            }
+            allowedResults.add(result);
         }
     }
 
 
     public ArrayList<Material> getBlacklistedBlocks() {
         return blacklistedBlocks;
+    }
+
+    public ArrayList<PlayerBedEnterEvent.BedEnterResult> getAllowedResults() {
+        return allowedResults;
     }
 
     public boolean doCreativeBypass() {

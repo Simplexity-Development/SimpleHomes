@@ -24,3 +24,9 @@ delay: # Delay after running the command to teleporting
   time-in-seconds: 5
   cancel-on-move: true
   buffer: 0.5
+bed-home: #set a home when interacting with a bed
+  enabled: true
+  allowed-results: #results on interaction with a bed to set a home automatically with. https://jd.papermc.io/paper/1.21.3/org/bukkit/event/player/PlayerBedEnterEvent.BedEnterResult.html
+    - OK
+    - NOT_POSSIBLE_NOW
+    - NOT_SAFE
