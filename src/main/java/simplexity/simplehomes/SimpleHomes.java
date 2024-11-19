@@ -2,11 +2,14 @@ package simplexity.simplehomes;
 
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.plugin.java.JavaPlugin;
-import simplexity.simplehomes.commands.*;
+import simplexity.simplehomes.commands.DeleteHome;
 import simplexity.simplehomes.commands.Home;
+import simplexity.simplehomes.commands.HomeList;
+import simplexity.simplehomes.commands.HomesReload;
+import simplexity.simplehomes.commands.ImportHomes;
+import simplexity.simplehomes.commands.SetHome;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
-import simplexity.simplehomes.listeners.BedEnterListener;
 import simplexity.simplehomes.listeners.PlayerMoveListener;
 import simplexity.simplehomes.saving.SQLHandler;
 
@@ -27,7 +30,6 @@ public final class SimpleHomes extends JavaPlugin {
         LocaleHandler.getInstance().loadLocale();
         SQLHandler.getInstance().init();
         this.getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
-        this.getServer().getPluginManager().registerEvents(new BedEnterListener(), this);
         registerCommands();
     }
 

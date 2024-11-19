@@ -1,9 +1,6 @@
 package simplexity.simplehomes.saving;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.configs.ConfigHandler;
@@ -52,7 +49,6 @@ public class SQLHandler {
                         pitch FLOAT
                         );""");
             }
-
         } catch (SQLException e) {
             logger.severe("Failed to connect to SQLite database");
             logger.severe("Error: " + e.getMessage());

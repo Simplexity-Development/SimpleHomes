@@ -2,7 +2,6 @@ package simplexity.simplehomes.configs;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.player.PlayerBedEnterEvent;
 import simplexity.simplehomes.SimpleHomes;
 
 import java.util.ArrayList;
@@ -13,7 +12,6 @@ public class ConfigHandler {
     private static ConfigHandler instance;
 
     private final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
-    private final ArrayList<PlayerBedEnterEvent.BedEnterResult> allowedResults = new ArrayList<>();
     private boolean creativeBypass, invulnerableBypass, mysql, lockoutEnabled, disableHome, disableHomeList,
             disableDeleteHome, delayEnabled, cancelOnMove, bedHomesEnabled;
     private String ip, name, username, password;
@@ -29,7 +27,6 @@ public class ConfigHandler {
         SimpleHomes.getInstance().reloadConfig();
         FileConfiguration config = SimpleHomes.getInstance().getConfig();
         List<String> blockList = config.getStringList("blacklisted-blocks");
-        List<String> resultList = config.getStringList("bed-home.allowed-results");
         creativeBypass = config.getBoolean("safety-bypass.creative", true);
         invulnerableBypass = config.getBoolean("safety-bypass.invulnerable", true);
         lockoutEnabled = config.getBoolean("lockout.enabled", false);
@@ -40,9 +37,8 @@ public class ConfigHandler {
         cancelOnMove = config.getBoolean("delay.cancel-on-move", true);
         timeInSeconds = config.getInt("delay.time-in-seconds", 5);
         bufferMovement = config.getDouble("delay.buffer-movement", 0.5);
-        bedHomesEnabled = config.getBoolean("bed-home.enabled", true);
+        bedHomesEnabled = config.getBoolean("bed-home.enabled", false);
         fillList(blockList);
-        verifyEnterEventResults(resultList);
         mysql = config.getBoolean("mysql.enabled", false);
         ip = config.getString("mysql.ip");
         name = config.getString("mysql.name");
@@ -62,34 +58,8 @@ public class ConfigHandler {
         }
     }
 
-    private void verifyEnterEventResults(List<String> stringList) {
-        allowedResults.clear();
-        if (stringList.isEmpty()) {
-            SimpleHomes.getInstance().getLogger().warning(stringList + " is empty. Please check your config, setting default configuration");
-            allowedResults.add(PlayerBedEnterEvent.BedEnterResult.NOT_POSSIBLE_NOW);
-            allowedResults.add(PlayerBedEnterEvent.BedEnterResult.NOT_SAFE);
-            allowedResults.add(PlayerBedEnterEvent.BedEnterResult.OK);
-            return;
-        }
-        for (String string : stringList) {
-            PlayerBedEnterEvent.BedEnterResult result;
-            try {
-                result = PlayerBedEnterEvent.BedEnterResult.valueOf(string);
-            } catch (IllegalArgumentException e) {
-                SimpleHomes.getInstance().getLogger().warning(string + " is not a valid event result, please check your config");
-                continue;
-            }
-            allowedResults.add(result);
-        }
-    }
-
-
     public ArrayList<Material> getBlacklistedBlocks() {
         return blacklistedBlocks;
-    }
-
-    public ArrayList<PlayerBedEnterEvent.BedEnterResult> getAllowedResults() {
-        return allowedResults;
     }
 
     public boolean doCreativeBypass() {
@@ -150,5 +120,9 @@ public class ConfigHandler {
 
     public double getBufferMovement() {
         return bufferMovement;
+    }
+
+    public boolean areBedHomesEnabled() {
+        return bedHomesEnabled;
     }
 }

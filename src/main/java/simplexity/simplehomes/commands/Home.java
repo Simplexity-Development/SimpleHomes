@@ -50,6 +50,18 @@ public class Home implements TabExecutor {
             }
         }
         String homeName = args[0].toLowerCase();
+        boolean bypass = false;
+        if (args.length > 1) {
+            if (args[1].equalsIgnoreCase("-o")) {
+                bypass = true;
+            }
+        }
+        if (ConfigHandler.getInstance().areBedHomesEnabled() && homeName.equalsIgnoreCase("bed") && player.hasPermission("homes.bed")) {
+            Location location = player.getPotentialBedLocation();
+            if (!safeTeleport(location, bypass, player)) return false;
+            delayTeleport(location, player, "bed");
+            return true;
+        }
         simplexity.simplehomes.Home home = null;
         if (Util.homeExists(playerHomes, homeName)) {
             home = SQLHandler.getInstance().getHome(player.getUniqueId(), homeName);
@@ -59,12 +71,6 @@ public class Home implements TabExecutor {
             return false;
         }
         Location homeLocation = home.location();
-        boolean bypass = false;
-        if (args.length > 1) {
-            if (args[1].equalsIgnoreCase("-o")) {
-                bypass = true;
-            }
-        }
         if (!safeTeleport(homeLocation, bypass, player)) return false;
         delayTeleport(homeLocation, player, homeName);
         return false;
@@ -141,6 +147,9 @@ public class Home implements TabExecutor {
             List<String> homeList = new ArrayList<>();
             for (simplexity.simplehomes.Home home : SQLHandler.getInstance().getHomes(player.getUniqueId())) {
                 homeList.add(home.name());
+            }
+            if (ConfigHandler.getInstance().areBedHomesEnabled() && player.getPotentialBedLocation() != null) {
+                homeList.add("bed");
             }
             return homeList;
         }
