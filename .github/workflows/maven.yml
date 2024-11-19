@@ -27,7 +27,7 @@ jobs:
       - name: Check for [ci skip]
         id: skip_check
         run: |
-          if git log -1 --pretty=%B | grep -iqE '\[ci skip\]|\[skip ci\]'; then
+          if git log -1 --pretty=%B | grep -iqE '\[ci skip\]|\[skip ci\]|\[ci-skip\]'; then
             echo "skip=true" >> $GITHUB_ENV
           else
             echo "skip=false" >> $GITHUB_ENV

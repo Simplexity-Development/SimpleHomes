@@ -39,11 +39,6 @@ public final class SimpleHomes extends JavaPlugin {
         return miniMessage;
     }
 
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
-    }
-
     private void registerCommands() {
         Objects.requireNonNull(this.getCommand("sethome")).setExecutor(new SetHome());
         Objects.requireNonNull(this.getCommand("delhome")).setExecutor(new DeleteHome());

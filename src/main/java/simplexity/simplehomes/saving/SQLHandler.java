@@ -34,7 +34,6 @@ public class SQLHandler {
         return instance;
     }
 
-
     public void init() {
         try {
             connection = sqlOrSqlLite();
