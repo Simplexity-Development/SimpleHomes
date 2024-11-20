@@ -16,7 +16,7 @@ public enum SafetyFlags {
         this.bitFlag = bitFlag;
     }
 
-    public boolean checkFlag(int bitFlags) {
+    public boolean matches(int bitFlags) {
         int result = bitFlag & bitFlags;
         return result == bitFlag;
     }

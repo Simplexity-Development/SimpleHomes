@@ -23,6 +23,7 @@ provides a straightforward interface for home management commands.
 | `homes.commands.delhome` | op      | Allows player to delete home                                                     |
 | `homes.commands.home`    | op      | Allows player to teleport to home                                                |
 | `homes.commands.list`    | op      | Allows you to list your own homes                                                |
+| `homes.bed`              | op      | Allows you to teleport to your bed                                               |
 | `homes.count`            | op      | Base for permission on number of homes you can have                              |
 | `homes.count.<num>`      | op      | Base for permission on number of homes you can have                              |
 | `homes.count.bypass`     | op      | Allows for setting infinite homes regardless of how many you have set as the max |
@@ -32,12 +33,15 @@ provides a straightforward interface for home management commands.
 ## Importing from other plugins
 
 **THIS COMMAND IS IRREVERSIBLE AND WILL DELETE ANY HOMES YOU HAVE ALREADY SET IN SIMPLEHOMES**
-it is **HIGHLY** recommended you do not run this command while anyone is online, to reduce the risk of any save corruption.
+it is **HIGHLY** recommended you do not run this command while anyone is online, to reduce the risk of any save
+corruption.
 **USE AT YOUR OWN RISK**
 
 To import from another plugin, you need to go to console, as the command is console-only. Command syntax is as follows:
 `importhomes <plugin> [player]`
-The player argument is optional, if you want to import all homes that are saved in the plugin specified, leave the player argument out.
+The player argument is optional, if you want to import all homes that are saved in the plugin specified, leave the
+player argument out.
 
 Currently supported plugins to import from:
+
 - Essentials

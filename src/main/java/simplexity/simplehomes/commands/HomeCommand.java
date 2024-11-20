@@ -1,36 +1,57 @@
 package simplexity.simplehomes.commands;
 
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import simplexity.simplehomes.SafetyCheck;
-import simplexity.simplehomes.SimpleHomes;
-import simplexity.simplehomes.Util;
+import simplexity.simplehomes.Home;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLHandler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Home implements TabExecutor {
-    MiniMessage miniMessage = SimpleHomes.getMiniMessage();
+public class HomeCommand implements TabExecutor {
+
+    private static final String HOMES_COUNT_BASE =  "homes.count.";
+    private static final String HOMES_COUNT_BYPASS = "homes.count.bypass";
+    private static final String HOMES_SAFETY_BYPASS = "homes.safety.bypass";
+    private static final String HOMES_DELAY_BYPASS = "homes.delay.bypass";
+    private static final String HOMES_BED = "homes.bed";
     public static HashMap<Player, Location> teleportRequests = new HashMap<>();
     public static HashMap<Player, BukkitTask> teleportTasks = new HashMap<>();
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
+            return false;
+        }
+        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
+        if (args.length == 0) {
+
+        }
+        return true;
+    }
+
+    private boolean bedHome(Player player) {
+        if (player.getPotentialBedLocation() == null) return false;
+        if (!ConfigHandler.getInstance().areBedHomesEnabled()) return false;
+        if (!player.hasPermission(HOMES_BED)) return false;
+
+    }
+
+
+
+
+
+
+
+        /*
         if (!(sender instanceof Player player)) {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
@@ -107,6 +128,7 @@ public class Home implements TabExecutor {
         return true;
     }
 
+
     private void delayTeleport(Location location, Player player, String homeName) {
         if (player.hasPermission("homes.delay.bypass")) {
             player.teleportAsync(location);
@@ -154,5 +176,5 @@ public class Home implements TabExecutor {
             return homeList;
         }
         return null;
-    }
-}
+    }*/
+    }}
