@@ -14,7 +14,7 @@ public class ConfigHandler {
     private final ArrayList<Material> blacklistedBlocks = new ArrayList<>();
     private boolean creativeBypass, invulnerableBypass, mysql, lockoutEnabled, disableHome, disableHomeList,
             disableDeleteHome, delayEnabled, cancelOnMove, bedHomesEnabled;
-    private String ip, name, username, password;
+    private String ip, name, username, password, bedHomesName;
     private int timeInSeconds;
     private double bufferMovement;
 
@@ -38,6 +38,7 @@ public class ConfigHandler {
         timeInSeconds = config.getInt("delay.time-in-seconds", 5);
         bufferMovement = config.getDouble("delay.buffer-movement", 0.5);
         bedHomesEnabled = config.getBoolean("bed-home.enabled", false);
+        bedHomesName = config.getString("bed-home.name", "bed");
         fillList(blockList);
         mysql = config.getBoolean("mysql.enabled", false);
         ip = config.getString("mysql.ip");
@@ -124,5 +125,9 @@ public class ConfigHandler {
 
     public boolean areBedHomesEnabled() {
         return bedHomesEnabled;
+    }
+
+    public String getBedHomesName() {
+        return bedHomesName;
     }
 }

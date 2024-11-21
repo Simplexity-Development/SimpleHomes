@@ -1,5 +1,7 @@
 package simplexity.simplehomes.commands;
 
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -7,23 +9,31 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
+import simplexity.simplehomes.SafetyCheck;
+import simplexity.simplehomes.SafetyFlags;
+import simplexity.simplehomes.SimpleHomes;
+import simplexity.simplehomes.Util;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLHandler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class HomeCommand implements TabExecutor {
 
-    private static final String HOMES_COUNT_BASE =  "homes.count.";
     private static final String HOMES_COUNT_BYPASS = "homes.count.bypass";
     private static final String HOMES_SAFETY_BYPASS = "homes.safety.bypass";
     private static final String HOMES_DELAY_BYPASS = "homes.delay.bypass";
     private static final String HOMES_BED = "homes.bed";
+    private static final List<String> OVERRIDE_ARGS = List.of("-override", "-o");
     public static HashMap<Player, Location> teleportRequests = new HashMap<>();
     public static HashMap<Player, BukkitTask> teleportTasks = new HashMap<>();
+
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
@@ -31,150 +41,176 @@ public class HomeCommand implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
+        List<Home> playerHomesList = SQLHandler.getInstance().getHomes(player.getUniqueId());
+        //Check for lockout
+        if (isLockedOut(player, playerHomesList)) {
+            player.sendRichMessage(LocaleHandler.getInstance().getCannotUseCommand(),
+                    Placeholder.parsed("value", String.valueOf(Util.maxHomesPermission(player))),
+                    Placeholder.parsed("command", "/home"));
+            return false;
+        }
+        // Get the home to teleport the player to
+        Home playerHome;
         if (args.length == 0) {
-
-        }
-        return true;
-    }
-
-    private boolean bedHome(Player player) {
-        if (player.getPotentialBedLocation() == null) return false;
-        if (!ConfigHandler.getInstance().areBedHomesEnabled()) return false;
-        if (!player.hasPermission(HOMES_BED)) return false;
-
-    }
-
-
-
-
-
-
-
-        /*
-        if (!(sender instanceof Player player)) {
-            sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
-            return false;
-        }
-        if (args.length < 1) {
-            sender.sendRichMessage(LocaleHandler.getInstance().getProvideHomeName());
-            return false;
-        }
-        List<simplexity.simplehomes.Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
-        if (ConfigHandler.getInstance().isLockoutEnabled() && ConfigHandler.getInstance().isDisableHome()) {
-            int maxHomeCount = Util.maxHomesPermission(player);
-            if (maxHomeCount < playerHomes.size() && !player.hasPermission("homes.count.bypass")) {
-                player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getCannotUseCommand(),
-                        Placeholder.parsed("value", String.valueOf(maxHomeCount)),
-                        Placeholder.parsed("command", "/home")));
+            playerHome = handleNoArgs(player, playerHomesList);
+            if (playerHome == null) {
+                player.sendRichMessage(LocaleHandler.getInstance().getListNoHomes());
+                return false;
+            }
+        } else {
+            playerHome = handleHomeSelection(player, playerHomesList, args[0]);
+            if (playerHome == null) {
+                player.sendRichMessage(LocaleHandler.getInstance().getHomeNotFound(),
+                        Placeholder.parsed("name", args[0]));
                 return false;
             }
         }
-        String homeName = args[0].toLowerCase();
-        boolean bypass = false;
-        if (args.length > 1) {
-            if (args[1].equalsIgnoreCase("-o")) {
-                bypass = true;
-            }
-        }
-        if (ConfigHandler.getInstance().areBedHomesEnabled() && homeName.equalsIgnoreCase("bed") && player.hasPermission("homes.bed")) {
-            Location location = player.getPotentialBedLocation();
-            if (!safeTeleport(location, bypass, player)) return false;
-            delayTeleport(location, player, "bed");
-            return true;
-        }
-        simplexity.simplehomes.Home home = null;
-        if (Util.homeExists(playerHomes, homeName)) {
-            home = SQLHandler.getInstance().getHome(player.getUniqueId(), homeName);
-        }
-        if (home == null) {
-            player.sendMessage(miniMessage.deserialize(LocaleHandler.getInstance().getNullHome(), Placeholder.parsed("name", homeName)));
-            return false;
-        }
-        Location homeLocation = home.location();
-        if (!safeTeleport(homeLocation, bypass, player)) return false;
-        delayTeleport(homeLocation, player, homeName);
-        return false;
-    }
-
-    private boolean safeTeleport(Location location, boolean bypass, Player player) {
-        if (bypassSafetyChecks(player, bypass)) {
-            return true;
-        }
-        if (SafetyCheck.willFall(location) && !player.isFlying()) {
-            player.sendRichMessage(LocaleHandler.getInstance().getVoidWarning() + LocaleHandler.getInstance().getInsertOverride());
-            return false;
-        }
-        if (SafetyCheck.insideFire(location) && !player.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
-            player.sendRichMessage(LocaleHandler.getInstance().getFireWarning() + LocaleHandler.getInstance().getInsertOverride());
-            return false;
-        }
-        if (SafetyCheck.insideLava(location) && !player.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
-            player.sendRichMessage(LocaleHandler.getInstance().getLavaWarning() + LocaleHandler.getInstance().getInsertOverride());
-            return false;
-        }
-        if (SafetyCheck.insideSolidBlocks(location)) {
-            player.sendRichMessage(LocaleHandler.getInstance().getBlocksWarning() + LocaleHandler.getInstance().getInsertOverride());
-            return false;
-        }
-        if (SafetyCheck.insideBlacklistedBlocks(location, ConfigHandler.getInstance().getBlacklistedBlocks())) {
-            player.sendRichMessage(LocaleHandler.getInstance().getBlacklistedWarning() + LocaleHandler.getInstance().getInsertOverride());
-            return false;
-        }
-        if (SafetyCheck.underWater(location)) {
-            player.sendRichMessage(LocaleHandler.getInstance().getWaterWarning() + LocaleHandler.getInstance().getInsertOverride());
-            return false;
-        }
+        // Check that it's safe
+        if (!shouldTeleport(player, args, playerHome)) return false;
+        handleTeleport(player, playerHome);
         return true;
     }
 
+    // If player has a bed home and supplied no args, return a new home from that location and the configured bed home name.
+    // Otherwise, if they only have one home, return that one.
+    // Otherwise, return null
 
-    private void delayTeleport(Location location, Player player, String homeName) {
-        if (player.hasPermission("homes.delay.bypass")) {
-            player.teleportAsync(location);
-            return;
+    private Home handleNoArgs(Player player, List<Home> homesList) {
+        Location bedHome = getBedLocation(player);
+        if (bedHome != null) return new Home(ConfigHandler.getInstance().getBedHomesName(), bedHome);
+        if (homesList.size() == 1) {
+            return homesList.get(0);
         }
+        return null;
+    }
+
+    private Home handleHomeSelection(Player player, List<Home> homesList, String suppliedName) {
+        Location bedLocation = getBedLocation(player);
+        if (suppliedName.equalsIgnoreCase(ConfigHandler.getInstance().getBedHomesName()) && bedLocation != null) {
+            return new Home(ConfigHandler.getInstance().getBedHomesName(), bedLocation);
+        }
+        for (Home home : homesList) {
+            if (home.name().equalsIgnoreCase(suppliedName)) {
+                return home;
+            }
+        }
+        return null;
+    }
+
+    // Do config, permission, and API checks for bed location
+    private Location getBedLocation(Player player) {
+        if (player.getPotentialBedLocation() == null) return null;
+        if (!ConfigHandler.getInstance().areBedHomesEnabled()) return null;
+        if (!player.hasPermission(HOMES_BED)) return null;
+        return player.getPotentialBedLocation();
+    }
+
+    // Safety Check
+    private boolean shouldTeleport(Player player, String[] args, Home home) {
+        if (player.hasPermission(HOMES_SAFETY_BYPASS)) return true;
+        if (shouldOverride(args)) return true;
+        int safetyFlags = SafetyCheck.checkSafetyFlags(home.location(), ConfigHandler.getInstance().getBlacklistedBlocks());
+        if (safetyFlags == 0) return true;
+        String safetyWarning = getSafetyWarning(safetyFlags);
+        if (safetyWarning == null) {
+            player.sendRichMessage(LocaleHandler.getInstance().getErrorHasOccurred());
+            return false;
+        }
+        player.sendRichMessage(safetyWarning);
+        return false;
+    }
+
+    // check for override arguments anywhere in the args
+    private boolean shouldOverride(String[] args) {
+        return Arrays.stream(args).anyMatch(arg -> OVERRIDE_ARGS.stream().anyMatch(arg::equalsIgnoreCase));
+    }
+
+    // Gets the configured messages for the safety warnings
+    private String getSafetyWarning(int safetyFlags) {
+        String warning = "";
+        if (safetyFlags == 0) return null;
+        if (SafetyFlags.DAMAGE_RISK.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getBlacklistedWarning();
+        }
+        if (SafetyFlags.FALLING.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getVoidWarning();
+        }
+        if (SafetyFlags.FIRE.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getFireWarning();
+        }
+        if (SafetyFlags.LAVA.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getLavaWarning();
+        }
+        if (SafetyFlags.NOT_SOLID.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getVoidWarning();
+        }
+        if (SafetyFlags.SUFFOCATION.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getBlocksWarning();
+        }
+        if (SafetyFlags.UNDERWATER.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getWaterWarning();
+        }
+        if (SafetyFlags.UNSTABLE.matches(safetyFlags)) {
+            warning = LocaleHandler.getInstance().getVoidWarning();
+        }
+        warning = warning + LocaleHandler.getInstance().getInsertOverride();
+        return warning;
+    }
+
+    // Check if they should be locked out lol
+    private boolean isLockedOut(Player player, List<Home> homesList) {
+        if (player.hasPermission(HOMES_COUNT_BYPASS)) return false;
+        if (!ConfigHandler.getInstance().isLockoutEnabled()) return false;
+        if (!ConfigHandler.getInstance().isDisableHome()) return false;
+        int maxHomesAllowed = Util.maxHomesPermission(player);
+        int currentHomes = homesList.size();
+        return currentHomes > maxHomesAllowed;
+    }
+
+    private void handleTeleport(Player player, Home home) {
         if (!ConfigHandler.getInstance().isDelayEnabled()) {
-            player.teleportAsync(location);
+            normalTeleport(player, home);
             return;
         }
+        if (player.hasPermission(HOMES_DELAY_BYPASS)) {
+            normalTeleport(player, home);
+            return;
+        }
+        delayTeleport(player, home);
+    }
+
+    private void normalTeleport(Player player, Home home) {
+        player.teleportAsync(home.location());
+        player.sendRichMessage(LocaleHandler.getInstance().getHomeTeleported(),
+                Placeholder.parsed("name", home.name()));
+    }
+
+    // Runnable that allows delaying the teleport, tied into the player move listener
+    private void delayTeleport(Player player, Home home) {
         player.sendRichMessage(LocaleHandler.getInstance().getPleaseWait(),
                 Placeholder.parsed("value", String.valueOf(ConfigHandler.getInstance().getTimeInSeconds())));
         teleportRequests.put(player, player.getLocation());
         BukkitTask teleportTask = Bukkit.getScheduler().runTaskLater(SimpleHomes.getInstance(), () -> {
             if (!teleportRequests.containsKey(player)) return;
-            player.teleportAsync(location);
+            player.teleportAsync(home.location());
             teleportRequests.remove(player);
             player.sendRichMessage(LocaleHandler.getInstance().getHomeTeleported(),
-                    Placeholder.parsed("name", homeName));
+                    Placeholder.parsed("name", home.name()));
         }, ConfigHandler.getInstance().getTimeInSeconds() * 20L);
         teleportTasks.put(player, teleportTask);
     }
 
-
-    private boolean bypassSafetyChecks(Player player, boolean bypass) {
-        if (bypass) return true;
-        if (player.hasPermission("homes.safety.bypass")) return true;
-        if (player.getGameMode().equals(GameMode.SPECTATOR)) return true;
-        if (ConfigHandler.getInstance().doCreativeBypass() && player.getGameMode().equals(GameMode.CREATIVE))
-            return true;
-        if (ConfigHandler.getInstance().doInvulnerableBypass() && player.isInvulnerable()) return true;
-        return false;
-    }
-
-
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        if (args.length < 2 && sender instanceof Player player) {
-            List<String> homeList = new ArrayList<>();
-            for (simplexity.simplehomes.Home home : SQLHandler.getInstance().getHomes(player.getUniqueId())) {
-                homeList.add(home.name());
-            }
-            if (ConfigHandler.getInstance().areBedHomesEnabled() && player.getPotentialBedLocation() != null) {
-                homeList.add("bed");
-            }
-            return homeList;
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+        if (!(commandSender instanceof Player player)) return List.of();
+        List<Home> homesList = SQLHandler.getInstance().getHomes(player.getUniqueId());
+        List<String> stringList = new ArrayList<>();
+        for (Home home : homesList) {
+            stringList.add(home.name());
         }
-        return null;
-    }*/
-    }}
+        if (player.hasPermission(HOMES_BED) && getBedLocation(player) != null) {
+            stringList.add(ConfigHandler.getInstance().getBedHomesName());
+        }
+        return stringList;
+    }
+}
