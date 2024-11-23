@@ -98,14 +98,6 @@ public class SQLHandler {
         return null;
     }
 
-    public Home getHome(UUID uuid, String homeName) {
-        List<Home> homesList = cachedHomes.get(uuid);
-        for (Home home : homesList) {
-            if (home.name().equalsIgnoreCase(homeName)) return home;
-        }
-        return null;
-    }
-
     public boolean deleteHome(UUID uuid, String homeName) {
         // Prepare the SQL statement to check if the home exists
         String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";

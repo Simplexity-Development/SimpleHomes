@@ -14,7 +14,6 @@ import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SafetyCheck;
 import simplexity.simplehomes.SafetyFlags;
 import simplexity.simplehomes.SimpleHomes;
-import simplexity.simplehomes.Util;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLHandler;
@@ -25,10 +24,8 @@ import java.util.List;
 
 public class HomeCommand implements TabExecutor {
 
-    private static final String COUNT_BYPASS = "homes.count.bypass";
     private static final String SAFETY_BYPASS = "homes.safety.bypass";
     private static final String DELAY_BYPASS = "homes.delay.bypass";
-    private static final String BED_PERMISSION = "homes.bed";
     public static HashMap<Player, Location> teleportRequests = new HashMap<>();
     public static HashMap<Player, BukkitTask> teleportTasks = new HashMap<>();
 
@@ -41,9 +38,9 @@ public class HomeCommand implements TabExecutor {
         }
         List<Home> playerHomesList = SQLHandler.getInstance().getHomes(player.getUniqueId());
         //Check for lockout
-        if (isLockedOut(player, playerHomesList)) {
+        if (CommandUtils.isLockedOut(player)) {
             player.sendRichMessage(LocaleHandler.getInstance().getCannotUseCommand(),
-                    Placeholder.parsed("value", String.valueOf(Util.maxHomesPermission(player))),
+                    Placeholder.parsed("value", String.valueOf(CommandUtils.maxHomesPermission(player))),
                     Placeholder.parsed("command", "/home"));
             return false;
         }
@@ -87,26 +84,21 @@ public class HomeCommand implements TabExecutor {
         if (suppliedName.equalsIgnoreCase(ConfigHandler.getInstance().getBedHomesName()) && bedLocation != null) {
             return new Home(ConfigHandler.getInstance().getBedHomesName(), bedLocation);
         }
-        for (Home home : homesList) {
-            if (home.name().equalsIgnoreCase(suppliedName)) {
-                return home;
-            }
-        }
-        return null;
+        return CommandUtils.getHomeFromList(homesList, suppliedName);
     }
 
     // Do config, permission, and API checks for bed location
     private Location getBedLocation(Player player) {
         if (player.getPotentialBedLocation() == null) return null;
         if (!ConfigHandler.getInstance().areBedHomesEnabled()) return null;
-        if (!player.hasPermission(BED_PERMISSION)) return null;
+        if (!player.hasPermission(CommandUtils.BED_PERMISSION)) return null;
         return player.getPotentialBedLocation();
     }
 
     // Safety Check
     private boolean shouldTeleport(Player player, String[] args, Home home) {
         if (player.hasPermission(SAFETY_BYPASS)) return true;
-        if (Util.shouldOverride(args)) return true;
+        if (CommandUtils.shouldOverride(args)) return true;
         int safetyFlags = SafetyCheck.checkSafetyFlags(home.location(), ConfigHandler.getInstance().getBlacklistedBlocks());
         if (safetyFlags == 0) return true;
         String safetyWarning = getSafetyWarning(safetyFlags);
@@ -150,16 +142,6 @@ public class HomeCommand implements TabExecutor {
         return warning;
     }
 
-    // Check if they should be locked out lol
-    private boolean isLockedOut(Player player, List<Home> homesList) {
-        if (player.hasPermission(COUNT_BYPASS)) return false;
-        if (!ConfigHandler.getInstance().isLockoutEnabled()) return false;
-        if (!ConfigHandler.getInstance().isDisableHome()) return false;
-        int maxHomesAllowed = Util.maxHomesPermission(player);
-        int currentHomes = homesList.size();
-        return currentHomes > maxHomesAllowed;
-    }
-
     private void handleTeleport(Player player, Home home) {
         if (!ConfigHandler.getInstance().isDelayEnabled()) {
             normalTeleport(player, home);
@@ -201,7 +183,7 @@ public class HomeCommand implements TabExecutor {
         for (Home home : homesList) {
             stringList.add(home.name());
         }
-        if (player.hasPermission(BED_PERMISSION) && getBedLocation(player) != null) {
+        if (player.hasPermission(CommandUtils.BED_PERMISSION) && getBedLocation(player) != null) {
             stringList.add(ConfigHandler.getInstance().getBedHomesName());
         }
         return stringList;

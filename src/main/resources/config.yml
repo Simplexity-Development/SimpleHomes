@@ -27,3 +27,4 @@ delay: # Delay after running the command to teleporting
 bed-home: #set a home when interacting with a bed
   enabled: false
   name: "bed" #this will be reserved and not able to be used on /sethome
+default-home-name: "home"
