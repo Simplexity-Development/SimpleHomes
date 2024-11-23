@@ -7,6 +7,7 @@ import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.saving.SQLHandler;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -59,7 +60,7 @@ public class CommandUtils {
 
     // This is going to hopefully be more useful the more flags are added
     public static List<String> getSanitizedArgsList(String[] args){
-        List<String> argsList = Arrays.asList(args);
+        List<String> argsList =  new ArrayList<>(List.of(args));
         argsList.removeIf(OVERRIDE_ARGS::contains);
         return argsList;
     }
