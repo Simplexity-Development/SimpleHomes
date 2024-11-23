@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -23,6 +24,8 @@ public class SQLHandler {
 
     private SQLHandler() {
     }
+
+    private static final HashMap<UUID, List<Home>> cachedHomes = new HashMap<>();
 
     private static SQLHandler instance;
 
@@ -56,8 +59,10 @@ public class SQLHandler {
         }
     }
 
-
     public List<Home> getHomes(UUID uuid) {
+        if (cachedHomes.containsKey(uuid)) {
+            return cachedHomes.get(uuid);
+        }
         List<Home> homes = new ArrayList<>();
         String query = "SELECT * FROM homes WHERE player_uuid = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -78,6 +83,7 @@ public class SQLHandler {
                             )
                     ));
                 }
+                cachedHomes.put(uuid, homes);
                 return homes;
             } catch (SQLException e) {
                 logger.severe("Failed to get homes");
@@ -86,42 +92,6 @@ public class SQLHandler {
             }
         } catch (SQLException e) {
             logger.severe("Failed to get homes");
-            logger.severe("Error occurred at Home Checking.");
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public Home getHome(UUID uuid, String homeName) {
-        // Prepare the SQL statement to check if the home exists
-        String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
-        try (PreparedStatement homeExists = connection.prepareStatement(checkIfExistsQuery)) {
-            homeExists.setString(1, uuid.toString());
-            homeExists.setString(2, homeName);
-            try (ResultSet resultSet = homeExists.executeQuery()) {
-                if (resultSet.next()) {
-                    String worldUUIDString = resultSet.getString("world_uuid");
-                    UUID worldUUID = UUID.fromString(worldUUIDString);
-                    return new Home(
-                            resultSet.getString("home_name"),
-                            new Location(
-                                    SimpleHomes.getInstance().getServer().getWorld(worldUUID),
-                                    resultSet.getDouble("location_x"),
-                                    resultSet.getDouble("location_y"),
-                                    resultSet.getDouble("location_z"),
-                                    resultSet.getFloat("yaw"),
-                                    resultSet.getFloat("pitch")
-                            )
-                    );
-                }
-                return null;
-            } catch (SQLException e) {
-                logger.severe("Failed to get home");
-                logger.severe("Error occurred at Home Result.");
-                e.printStackTrace();
-            }
-        } catch (SQLException e) {
-            logger.severe("Failed to get home");
             logger.severe("Error occurred at Home Checking.");
             e.printStackTrace();
         }
@@ -151,6 +121,7 @@ public class SQLHandler {
             e.printStackTrace();
             return false; // Error occurred while deleting home
         }
+        updateCache(uuid);
         return false;
     }
 
@@ -175,7 +146,41 @@ public class SQLHandler {
             e.printStackTrace();
             return false; // Error occurred while setting home
         }
+        updateCache(uuid);
         return true; // Home set successfully
+    }
+
+    private void updateCache(UUID uuid) {
+        List<Home> homes = new ArrayList<>();
+        String query = "SELECT * FROM homes WHERE player_uuid = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, uuid.toString());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String worldUUIDString = resultSet.getString("world_uuid");
+                    UUID worldUUID = UUID.fromString(worldUUIDString);
+                    homes.add(new Home(
+                            resultSet.getString("home_name"),
+                            new Location(
+                                    SimpleHomes.getInstance().getServer().getWorld(worldUUID),
+                                    resultSet.getDouble("location_x"),
+                                    resultSet.getDouble("location_y"),
+                                    resultSet.getDouble("location_z"),
+                                    resultSet.getFloat("yaw"),
+                                    resultSet.getFloat("pitch")
+                            )
+                    ));
+                }
+                cachedHomes.put(uuid, homes);
+            }
+        } catch (SQLException e) {
+            logger.severe("Failed to update cache");
+            e.printStackTrace();
+        }
+    }
+
+    public void removePlayerFromCache(UUID uuid) {
+        cachedHomes.remove(uuid);
     }
 
     private Connection sqlOrSqlLite() throws SQLException {

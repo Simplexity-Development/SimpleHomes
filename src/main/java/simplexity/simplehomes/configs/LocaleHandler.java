@@ -22,7 +22,8 @@ public class LocaleHandler {
     private final FileConfiguration localeConfig = new YamlConfiguration();
     private final Logger logger = SimpleHomes.getInstance().getLogger();
     //---------
-    private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome, cannotSetMoreHomes, cannotUseCommand, errorHasOccurred;
+    private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome, cannotSetMoreHomes,
+            cannotUseCommand, errorHasOccurred, noPermission;
     private String insertName, insertWorld, insertXLoc, insertYLoc, insertZLoc, insertOverride;
     private String homeSet, homeDeleted, homeTeleported, pluginReloaded, listHeader, listItem, listNoHomes;
     private String blacklistedWarning, voidWarning, fireWarning, blocksWarning, lavaWarning, waterWarning;
@@ -60,6 +61,7 @@ public class LocaleHandler {
         cannotSetMoreHomes = localeConfig.getString("errors.cannot-set-more-homes", "<red>You have already set <dark_red><bold><value></bold></dark_red> homes- you cannot set any more. Delete one of your current homes to set a new one.</red>");
         cannotUseCommand = localeConfig.getString("errors.cannot-use-command", "<red>You currently have more than <dark_red><bold><value></bold></dark_red> homes. In order to use <gray><command></gray> you must first delete some homes.</red>");
         errorHasOccurred = localeConfig.getString("errors.error-has-occurred", "<red>An error has occurred while running this command. Please contact the server staff to let them know (-SimpleHomes Plugin)</red>");
+        noPermission = localeConfig.getString("errors.no-permission", "<red>You do not have permission to use <value></red>");
         insertName = localeConfig.getString("inserts.name", "<yellow><name></yellow>");
         insertWorld = localeConfig.getString("inserts.world", "<yellow><world></yellow>");
         insertXLoc = localeConfig.getString("inserts.x-loc", "<yellow><x-loc>x</yellow>,");
@@ -289,4 +291,9 @@ public class LocaleHandler {
     public String getYouMoved() {
         return youMoved;
     }
+
+    public String getNoPermission() {
+        return noPermission;
+    }
+
 }
