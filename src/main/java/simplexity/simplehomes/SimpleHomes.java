@@ -10,6 +10,7 @@ import simplexity.simplehomes.commands.ImportHomes;
 import simplexity.simplehomes.commands.SetHome;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
+import simplexity.simplehomes.listeners.PlayerLeaveListener;
 import simplexity.simplehomes.listeners.PlayerMoveListener;
 import simplexity.simplehomes.saving.SQLHandler;
 
@@ -30,6 +31,7 @@ public final class SimpleHomes extends JavaPlugin {
         LocaleHandler.getInstance().loadLocale();
         SQLHandler.getInstance().init();
         this.getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerLeaveListener(), this);
         registerCommands();
     }
 

@@ -20,17 +20,15 @@ import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.SQLHandler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 public class HomeCommand implements TabExecutor {
 
-    private static final String HOMES_COUNT_BYPASS = "homes.count.bypass";
-    private static final String HOMES_SAFETY_BYPASS = "homes.safety.bypass";
-    private static final String HOMES_DELAY_BYPASS = "homes.delay.bypass";
-    private static final String HOMES_BED = "homes.bed";
-    private static final List<String> OVERRIDE_ARGS = List.of("-override", "-o");
+    private static final String COUNT_BYPASS = "homes.count.bypass";
+    private static final String SAFETY_BYPASS = "homes.safety.bypass";
+    private static final String DELAY_BYPASS = "homes.delay.bypass";
+    private static final String BED_PERMISSION = "homes.bed";
     public static HashMap<Player, Location> teleportRequests = new HashMap<>();
     public static HashMap<Player, BukkitTask> teleportTasks = new HashMap<>();
 
@@ -101,14 +99,14 @@ public class HomeCommand implements TabExecutor {
     private Location getBedLocation(Player player) {
         if (player.getPotentialBedLocation() == null) return null;
         if (!ConfigHandler.getInstance().areBedHomesEnabled()) return null;
-        if (!player.hasPermission(HOMES_BED)) return null;
+        if (!player.hasPermission(BED_PERMISSION)) return null;
         return player.getPotentialBedLocation();
     }
 
     // Safety Check
     private boolean shouldTeleport(Player player, String[] args, Home home) {
-        if (player.hasPermission(HOMES_SAFETY_BYPASS)) return true;
-        if (shouldOverride(args)) return true;
+        if (player.hasPermission(SAFETY_BYPASS)) return true;
+        if (Util.shouldOverride(args)) return true;
         int safetyFlags = SafetyCheck.checkSafetyFlags(home.location(), ConfigHandler.getInstance().getBlacklistedBlocks());
         if (safetyFlags == 0) return true;
         String safetyWarning = getSafetyWarning(safetyFlags);
@@ -118,11 +116,6 @@ public class HomeCommand implements TabExecutor {
         }
         player.sendRichMessage(safetyWarning);
         return false;
-    }
-
-    // check for override arguments anywhere in the args
-    private boolean shouldOverride(String[] args) {
-        return Arrays.stream(args).anyMatch(arg -> OVERRIDE_ARGS.stream().anyMatch(arg::equalsIgnoreCase));
     }
 
     // Gets the configured messages for the safety warnings
@@ -159,7 +152,7 @@ public class HomeCommand implements TabExecutor {
 
     // Check if they should be locked out lol
     private boolean isLockedOut(Player player, List<Home> homesList) {
-        if (player.hasPermission(HOMES_COUNT_BYPASS)) return false;
+        if (player.hasPermission(COUNT_BYPASS)) return false;
         if (!ConfigHandler.getInstance().isLockoutEnabled()) return false;
         if (!ConfigHandler.getInstance().isDisableHome()) return false;
         int maxHomesAllowed = Util.maxHomesPermission(player);
@@ -172,7 +165,7 @@ public class HomeCommand implements TabExecutor {
             normalTeleport(player, home);
             return;
         }
-        if (player.hasPermission(HOMES_DELAY_BYPASS)) {
+        if (player.hasPermission(DELAY_BYPASS)) {
             normalTeleport(player, home);
             return;
         }
@@ -208,7 +201,7 @@ public class HomeCommand implements TabExecutor {
         for (Home home : homesList) {
             stringList.add(home.name());
         }
-        if (player.hasPermission(HOMES_BED) && getBedLocation(player) != null) {
+        if (player.hasPermission(BED_PERMISSION) && getBedLocation(player) != null) {
             stringList.add(ConfigHandler.getInstance().getBedHomesName());
         }
         return stringList;

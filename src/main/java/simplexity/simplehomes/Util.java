@@ -1,12 +1,19 @@
 package simplexity.simplehomes;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class Util {
-    
+
+    private static final List<String> OVERRIDE_ARGS = List.of("-override", "-o");
+    private static final List<String> PLAYER_ARGS = List.of("-player", "-p");
+
     public static boolean homeExists(List<Home> homes, String homeName) {
         for (Home home : homes) {
             if (home.name().equalsIgnoreCase(homeName)) {
@@ -32,4 +39,10 @@ public class Util {
         }
         return maxHomes;
     }
+
+    // check for override arguments anywhere in the args
+    public static boolean shouldOverride(String[] args) {
+        return Arrays.stream(args).anyMatch(arg -> OVERRIDE_ARGS.stream().anyMatch(arg::equalsIgnoreCase));
+    }
+
 }

@@ -75,3 +75,6 @@ permissions:
   homes.reload:
     default: op
     description: allows reloading the config
+  homes.admin.teleport:
+    default: op
+    description: allows teleporting to other players' homes with the -p argument
