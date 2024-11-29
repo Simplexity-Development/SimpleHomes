@@ -63,6 +63,7 @@ public class SetHome implements CommandExecutor {
     }
 
     private boolean canSetMoreHomes(Player player, List<Home> homesList) {
+        if (player.hasPermission(CommandUtils.COUNT_BYPASS)) return true;
         int maxHomes = CommandUtils.maxHomesPermission(player);
         int currentHomes = homesList.size();
         return currentHomes < maxHomes;
