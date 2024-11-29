@@ -22,7 +22,11 @@ public class SetHome implements CommandExecutor {
             return false;
         }
         List<Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
-
+        if (!canSetMoreHomes(player, playerHomes)) {
+            sender.sendRichMessage(LocaleHandler.getInstance().getCannotSetMoreHomes(),
+                    Placeholder.parsed("value", String.valueOf(CommandUtils.maxHomesPermission(player))));
+            return false;
+        }
         if (args.length == 0) {
             handleNoArgs(player, playerHomes);
             return true;
@@ -56,5 +60,11 @@ public class SetHome implements CommandExecutor {
     private void handleSetHome(Player player, String homeName) {
         SQLHandler.getInstance().setHome(player.getUniqueId(), player.getLocation(), homeName);
         player.sendRichMessage(LocaleHandler.getInstance().getHomeSet(), Placeholder.unparsed("name", homeName));
+    }
+
+    private boolean canSetMoreHomes(Player player, List<Home> homesList) {
+        int maxHomes = CommandUtils.maxHomesPermission(player);
+        int currentHomes = homesList.size();
+        return currentHomes < maxHomes;
     }
 }

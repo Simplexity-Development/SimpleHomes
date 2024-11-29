@@ -26,13 +26,10 @@ public final class SimpleHomes extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        saveDefaultConfig();
-        ConfigHandler.getInstance().loadConfigValues();
-        LocaleHandler.getInstance().loadLocale();
+        handleConfig();
         SQLHandler.getInstance().init();
-        this.getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
-        this.getServer().getPluginManager().registerEvents(new PlayerLeaveListener(), this);
         registerCommands();
+        registerListeners();
     }
 
     public static SimpleHomes getInstance() {
@@ -50,5 +47,18 @@ public final class SimpleHomes extends JavaPlugin {
         Objects.requireNonNull(this.getCommand("homelist")).setExecutor(new HomeList());
         Objects.requireNonNull(this.getCommand("homesreload")).setExecutor(new HomesReload());
         Objects.requireNonNull(this.getCommand("importhomes")).setExecutor(new ImportHomes());
+    }
+
+    private void registerListeners(){
+        this.getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerLeaveListener(), this);
+    }
+
+    private void handleConfig(){
+        saveDefaultConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        ConfigHandler.getInstance().loadConfigValues();
+        LocaleHandler.getInstance().loadLocale();
     }
 }
