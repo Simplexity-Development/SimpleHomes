@@ -25,44 +25,38 @@ commands:
     description: Console only command for importing from other plugins.
 permissions:
   homes:
-    default: op
+    default: true
     description: allows base plugin functionality
   homes.commands:
-    default: op
+    default: true
     description: allows player to use commands
+    children:
+      homes.commands.sethome: true
+      homes.commands.delhome: true
+      homes.commands.home: true
+      homes.commands.list: true
+      homes.bed: true
+  homes.bed:
+    default: true
+    description: sets a home at your bed when you interact with it
   homes.commands.sethome:
-    default: op
+    default: true
     description: allows player to set home
-    children:
-      homes.commands: true
   homes.commands.delhome:
-    default: op
+    default: true
     description: allows player to delete home
-    children:
-      homes.commands: true
   homes.commands.home:
-    default: op
+    default: true
     description: allows player to teleport to home
-    children:
-      homes.commands: true
+  homes.commands.list:
+    default: true
+    description: allows you to list your own homes
   homes.count:
     default: op
     description: base for permission on number of homes you can have
   homes.count.bypass:
     default: op
     description: allows for setting infinite homes regardless of how many you have set as the max
-    children:
-      homes.count: true
-  homes.commands.list:
-    default: op
-    description: allows you to list your own homes
-    children:
-      homes.commands: true
-  homes.bed:
-    default: op
-    description: sets a home at your bed when you interact with it
-    children:
-      homes.commands: true
   homes.safety.bypass:
     default: false
     description: allows bypassing the safety checks

@@ -15,7 +15,7 @@ public class ConfigHandler {
     private boolean creativeBypass, invulnerableBypass, mysql, lockoutEnabled, disableHome, disableHomeList,
             disableDeleteHome, delayEnabled, cancelOnMove, bedHomesEnabled;
     private String ip, name, username, password, bedHomesName, defaultHomeName;
-    private int timeInSeconds;
+    private int timeInSeconds, defaultMaxHomeCount;
     private double bufferMovement;
 
     public static ConfigHandler getInstance() {
@@ -40,6 +40,7 @@ public class ConfigHandler {
         bedHomesEnabled = config.getBoolean("bed-home.enabled", false);
         bedHomesName = config.getString("bed-home.name", "bed");
         defaultHomeName = config.getString("default-home-name", "home");
+        defaultMaxHomeCount = config.getInt("default-max-home-count", 3);
         fillList(blockList);
         mysql = config.getBoolean("mysql.enabled", false);
         ip = config.getString("mysql.ip");
@@ -134,5 +135,9 @@ public class ConfigHandler {
 
     public String getDefaultHomeName() {
         return defaultHomeName;
+    }
+
+    public int getDefaultMaxHomeCount() {
+        return defaultMaxHomeCount;
     }
 }

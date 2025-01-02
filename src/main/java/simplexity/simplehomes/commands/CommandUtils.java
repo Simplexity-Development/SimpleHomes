@@ -32,6 +32,8 @@ public class CommandUtils {
     public static boolean hasMoreHomesThanAllowed(Player player){
         UUID playerUUID = player.getUniqueId();
         List<Home> playerHomeList = SQLHandler.getInstance().getHomes(playerUUID);
+        int maxHomes = maxHomesPermission(player);
+        if (maxHomes < 0) return false;
         return playerHomeList.size() > maxHomesPermission(player);
     }
 
@@ -49,6 +51,9 @@ public class CommandUtils {
             } catch (NumberFormatException e) {
                 SimpleHomes.getInstance().getLogger().warning("Found homes permission with invalid number format: " + permission);
             }
+        }
+        if (maxHomes == 0) {
+            return ConfigHandler.getInstance().getDefaultMaxHomeCount();
         }
         return maxHomes;
     }

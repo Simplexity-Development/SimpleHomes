@@ -28,3 +28,6 @@ bed-home: #set a home when interacting with a bed
   enabled: false
   name: "bed" #this will be reserved and not able to be used on /sethome
 default-home-name: "home"
+# 0 for no default homes, -1 for infinite default homes
+#if you set someone's max homes lower than the default, their max homes will be what their permission is, not the default
+default-max-home-count: 3
