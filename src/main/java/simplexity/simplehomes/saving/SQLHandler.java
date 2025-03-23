@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 public class SQLHandler {
 
-    Connection connection;
+    private Connection connection;
     Logger logger = SimpleHomes.getInstance().getLogger();
 
     private SQLHandler() {
@@ -35,23 +35,22 @@ public class SQLHandler {
     }
 
     public void init() {
-        try {
-            connection = sqlOrSqlLite();
-            try (Statement statement = connection.createStatement()) {
-                statement.execute("""
-                        CREATE TABLE IF NOT EXISTS homes (
-                        player_uuid_and_name VARCHAR (255) PRIMARY KEY,
-                        player_uuid VARCHAR(36),
-                        home_name VARCHAR(255),
-                        world_uuid VARCHAR(255),
-                        world_name VARCHAR(255),
-                        location_x DOUBLE,
-                        location_y DOUBLE,
-                        location_z DOUBLE,
-                        yaw FLOAT,
-                        pitch FLOAT
-                        );""");
-            }
+
+        try (Statement statement = getConnection().createStatement()) {
+            statement.execute("""
+                    CREATE TABLE IF NOT EXISTS homes (
+                    player_uuid_and_name VARCHAR (255) PRIMARY KEY,
+                    player_uuid VARCHAR(36),
+                    home_name VARCHAR(255),
+                    world_uuid VARCHAR(255),
+                    world_name VARCHAR(255),
+                    location_x DOUBLE,
+                    location_y DOUBLE,
+                    location_z DOUBLE,
+                    yaw FLOAT,
+                    pitch FLOAT
+                    );""");
+
         } catch (SQLException e) {
             logger.severe("Failed to connect to SQLite database");
             logger.severe("Error: " + e.getMessage());
@@ -65,7 +64,7 @@ public class SQLHandler {
         }
         List<Home> homes = new ArrayList<>();
         String query = "SELECT * FROM homes WHERE player_uuid = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+        try (PreparedStatement statement = getConnection().prepareStatement(query)) {
             statement.setString(1, uuid.toString());
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -101,13 +100,13 @@ public class SQLHandler {
     public boolean deleteHome(UUID uuid, String homeName) {
         // Prepare the SQL statement to check if the home exists
         String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
-        try (PreparedStatement homeExists = connection.prepareStatement(checkIfExistsQuery)) {
+        try (PreparedStatement homeExists = getConnection().prepareStatement(checkIfExistsQuery)) {
             homeExists.setString(1, uuid.toString());
             homeExists.setString(2, homeName);
             try (ResultSet resultSet = homeExists.executeQuery()) {
                 if (resultSet.next()) { // Home exists
                     String deleteQuery = "DELETE FROM homes WHERE player_uuid = ? AND home_name = ?";
-                    try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+                    try (PreparedStatement deleteStatement = getConnection().prepareStatement(deleteQuery)) {
                         deleteStatement.setString(1, uuid.toString());
                         deleteStatement.setString(2, homeName);
                         deleteStatement.executeUpdate();
@@ -127,9 +126,9 @@ public class SQLHandler {
 
     public boolean setHome(UUID uuid, Location location, String homeName) {
         String insertQuery = "REPLACE INTO homes " +
-                "(player_uuid_and_name, player_uuid, home_name, world_uuid, location_x, location_y, location_z, yaw, pitch) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+                             "(player_uuid_and_name, player_uuid, home_name, world_uuid, location_x, location_y, location_z, yaw, pitch) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement insertStatement = getConnection().prepareStatement(insertQuery)) {
             insertStatement.setString(1, uuid + homeName);
             insertStatement.setString(2, uuid.toString());
             insertStatement.setString(3, homeName);
@@ -153,7 +152,7 @@ public class SQLHandler {
     private void updateCache(UUID uuid) {
         List<Home> homes = new ArrayList<>();
         String query = "SELECT * FROM homes WHERE player_uuid = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+        try (PreparedStatement statement = getConnection().prepareStatement(query)) {
             statement.setString(1, uuid.toString());
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -181,6 +180,13 @@ public class SQLHandler {
 
     public void removePlayerFromCache(UUID uuid) {
         cachedHomes.remove(uuid);
+    }
+
+    private Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed() || !connection.isValid(2)) {
+            connection = sqlOrSqlLite();
+        }
+        return connection;
     }
 
     private Connection sqlOrSqlLite() throws SQLException {
