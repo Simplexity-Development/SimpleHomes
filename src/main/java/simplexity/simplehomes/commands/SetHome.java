@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
-import simplexity.simplehomes.saving.SQLHandler;
+import simplexity.simplehomes.saving.Cache;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class SetHome implements CommandExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
+        List<Home> playerHomes = Cache.getInstance().getPlayerHomes(player.getUniqueId());
         if (!canSetMoreHomes(player, playerHomes)) {
             sender.sendRichMessage(LocaleHandler.getInstance().getCannotSetMoreHomes(),
                     Placeholder.parsed("value", String.valueOf(CommandUtils.maxHomesPermission(player))));
@@ -58,7 +58,7 @@ public class SetHome implements CommandExecutor {
     }
 
     private void handleSetHome(Player player, String homeName) {
-        SQLHandler.getInstance().setHome(player.getUniqueId(), player.getLocation(), homeName);
+        Cache.getInstance().setPlayerHome(player.getUniqueId(), player.getLocation(), homeName);
         player.sendRichMessage(LocaleHandler.getInstance().getHomeSet(), Placeholder.unparsed("name", homeName));
     }
 

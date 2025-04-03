@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.configs.LocaleHandler;
-import simplexity.simplehomes.saving.SQLHandler;
+import simplexity.simplehomes.saving.Cache;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class HomeList implements CommandExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomes = SQLHandler.getInstance().getHomes(player.getUniqueId());
+        List<Home> playerHomes = Cache.getInstance().getPlayerHomes(player.getUniqueId());
         //Check for lockout
         if (CommandUtils.isLockedOut(player)) {
             player.sendRichMessage(LocaleHandler.getInstance().getCannotUseCommand(),

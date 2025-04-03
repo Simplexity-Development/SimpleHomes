@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.configs.LocaleHandler;
+import simplexity.simplehomes.saving.Cache;
 import simplexity.simplehomes.saving.SQLHandler;
 
 import java.util.ArrayList;
@@ -42,12 +43,11 @@ public class DeleteHome implements TabExecutor {
         //Probably had to do with how I was originally putting it in but whatever, I'm doing it here now.
         Component parsedHomeDeleteMessage = LocaleHandler.getInstance().locationResolver(homeRequested,
                 LocaleHandler.getInstance().getHomeDeleted());
-        SQLHandler.getInstance().deleteHome(player.getUniqueId(), homeName);
+        Cache.getInstance().removeHomeByName(player.getUniqueId(), homeName);
         player.sendMessage(parsedHomeDeleteMessage);
         return true;
 
     }
-
 
 
     //Handle logic to get the home requested in the arguments

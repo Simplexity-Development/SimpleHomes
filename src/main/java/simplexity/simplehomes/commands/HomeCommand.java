@@ -16,6 +16,7 @@ import simplexity.simplehomes.SafetyFlags;
 import simplexity.simplehomes.SimpleHomes;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
+import simplexity.simplehomes.saving.Cache;
 import simplexity.simplehomes.saving.SQLHandler;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class HomeCommand implements TabExecutor {
             sender.sendRichMessage(LocaleHandler.getInstance().getMustBePlayer());
             return false;
         }
-        List<Home> playerHomesList = SQLHandler.getInstance().getHomes(player.getUniqueId());
+        List<Home> playerHomesList = Cache.getInstance().getPlayerHomes(player.getUniqueId());
         //Check for lockout
         if (CommandUtils.isLockedOut(player)) {
             player.sendRichMessage(LocaleHandler.getInstance().getCannotUseCommand(),
