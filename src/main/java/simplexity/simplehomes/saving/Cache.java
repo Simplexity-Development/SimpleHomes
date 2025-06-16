@@ -24,10 +24,7 @@ public class Cache {
     private final HashMap<UUID, List<Home>> cachedHomes = new HashMap<>();
 
     public List<Home> getPlayerHomes(UUID playerUuid) {
-        // Get cached homes if they're already cached, and returned
         if (cachedHomes.containsKey(playerUuid)) return cachedHomes.get(playerUuid);
-        // Otherwise, query the database, and cache the results, or create a blank array list and add it if there is no
-        // results. Return the newly cached data.
         List<Home> savedHomes = SQLHandler.getInstance().getHomes(playerUuid);
         if (savedHomes == null || savedHomes.isEmpty()) savedHomes = new ArrayList<>();
         cachedHomes.put(playerUuid, savedHomes);
@@ -62,7 +59,7 @@ public class Cache {
     @SuppressWarnings("JavaExistingMethodCanBeUsed")
     private Home getHomeFromList(List<Home> homes, String homeName) {
         for (Home home : homes) {
-            if (home.name().equalsIgnoreCase(homeName)) {
+            if (home.name().equals(homeName)) {
                 return home;
             }
         }

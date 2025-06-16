@@ -36,12 +36,17 @@ public class DeleteHome implements TabExecutor {
                     Placeholder.parsed("command", "/delhome"));
             return false;
         }
-        String homeName = args[0].toLowerCase();
+        String homeName = args[0];
         Home homeRequested = CommandUtils.getHomeFromList(playerHomesList, homeName);
+        if (homeRequested == null) {
+            player.sendRichMessage(
+                    LocaleHandler.getInstance().getHomeNotFound(),
+                    Placeholder.parsed("name", homeName));
+        }
         if (!shouldDelete(homeRequested, player, homeName)) return false;
         //Need to parse the message before deleting the home otherwise there's no home to send into the method. At least that's what happened originally.
         //Probably had to do with how I was originally putting it in but whatever, I'm doing it here now.
-        Component parsedHomeDeleteMessage = LocaleHandler.getInstance().locationResolver(homeRequested,
+        Component parsedHomeDeleteMessage = LocaleHandler.getInstance().homeComponent(homeRequested,
                 LocaleHandler.getInstance().getHomeDeleted());
         Cache.getInstance().removeHomeByName(player.getUniqueId(), homeName);
         player.sendMessage(parsedHomeDeleteMessage);

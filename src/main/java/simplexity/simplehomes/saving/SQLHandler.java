@@ -91,7 +91,6 @@ public class SQLHandler {
     }
 
     public void deleteHome(UUID uuid, String homeName) {
-        // Prepare the SQL statement to check if the home exists
         String checkIfExistsQuery = "SELECT * FROM homes WHERE player_uuid = ? AND home_name = ?";
         try (PreparedStatement homeExists = getConnection().prepareStatement(checkIfExistsQuery)) {
             homeExists.setString(1, uuid.toString());

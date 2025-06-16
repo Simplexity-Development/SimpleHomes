@@ -6,6 +6,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
 
@@ -24,7 +25,7 @@ public class LocaleHandler {
     //---------
     private String mustBePlayer, provideHomeName, homeAlreadyExists, homeNotFound, nullHome, cannotSetMoreHomes,
             cannotUseCommand, errorHasOccurred, noPermission;
-    private String insertName, insertWorld, insertXLoc, insertYLoc, insertZLoc, insertOverride;
+    private String insertName, insertWorld, insertXLoc, insertYLoc, insertZLoc, insertOverride, insertBedName;
     private String homeSet, homeDeleted, homeTeleported, pluginReloaded, listHeader, listItem, listNoHomes;
     private String blacklistedWarning, voidWarning, fireWarning, blocksWarning, lavaWarning, waterWarning;
     private String unsupportedDestructive, importHelp, importNotEnoughArgs, onlyConsole, cannotConfirm, timedOut, noValidPlugin,
@@ -63,6 +64,7 @@ public class LocaleHandler {
         errorHasOccurred = localeConfig.getString("errors.error-has-occurred", "<red>An error has occurred while running this command. Please contact the server staff to let them know (-SimpleHomes Plugin)</red>");
         noPermission = localeConfig.getString("errors.no-permission", "<red>You do not have permission to use <value></red>");
         insertName = localeConfig.getString("inserts.name", "<yellow><name></yellow>");
+        insertBedName = localeConfig.getString("inserts.bed-name", "<dark_gray><name></dark_gray>");
         insertWorld = localeConfig.getString("inserts.world", "<yellow><world></yellow>");
         insertXLoc = localeConfig.getString("inserts.x-loc", "<yellow><x-loc>x</yellow>,");
         insertYLoc = localeConfig.getString("inserts.y-loc", "<yellow><y-loc>y</yellow>,");
@@ -173,12 +175,28 @@ public class LocaleHandler {
         return listItem;
     }
 
-    public Component locationResolver(Home home, String message) {
-        if (home == null) {
-            return null;
-        }
+    public Component homeComponent(@NotNull Home home, String message) {
         Component nameComponent = miniMessage.deserialize(insertName,
                 Placeholder.unparsed("name", home.name()));
+        Component worldComponent = miniMessage.deserialize(insertWorld,
+                Placeholder.unparsed("world", home.location().getWorld().getName()));
+        Component xComponent = miniMessage.deserialize(insertXLoc,
+                Placeholder.unparsed("x-loc", String.valueOf(home.location().getBlockX())));
+        Component yComponent = miniMessage.deserialize(insertYLoc,
+                Placeholder.unparsed("y-loc", String.valueOf(home.location().getBlockY())));
+        Component zComponent = miniMessage.deserialize(insertZLoc,
+                Placeholder.unparsed("z-loc", String.valueOf(home.location().getBlockZ())));
+        return miniMessage.deserialize(message,
+                Placeholder.component("name", nameComponent),
+                Placeholder.component("world", worldComponent),
+                Placeholder.component("x-loc", xComponent),
+                Placeholder.component("y-loc", yComponent),
+                Placeholder.component("z-loc", zComponent));
+    }
+
+    public Component bedHomeComponent(@NotNull Home home, String message) {
+        Component nameComponent = miniMessage.deserialize(insertBedName,
+                Placeholder.unparsed("name", ConfigHandler.getInstance().getBedHomesName()));
         Component worldComponent = miniMessage.deserialize(insertWorld,
                 Placeholder.unparsed("world", home.location().getWorld().getName()));
         Component xComponent = miniMessage.deserialize(insertXLoc,
@@ -296,4 +314,7 @@ public class LocaleHandler {
         return noPermission;
     }
 
+    public String getInsertBedName() {
+        return insertBedName;
+    }
 }

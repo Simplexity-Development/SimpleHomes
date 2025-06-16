@@ -3,6 +3,7 @@ package simplexity.simplehomes.commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import simplexity.simplehomes.Home;
 import simplexity.simplehomes.SimpleHomes;
+import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
 import simplexity.simplehomes.saving.Cache;
 
@@ -33,12 +35,17 @@ public class HomeList implements CommandExecutor {
                     Placeholder.parsed("command", "/homelist"));
             return false;
         }
-        Component listMessage = createHomesListMessage(playerHomes);
+        Home bedHome = null;
+        Location potentialBedLocation = player.getPotentialBedLocation();
+        if (potentialBedLocation != null) {
+            bedHome = new Home(ConfigHandler.getInstance().getBedHomesName(), potentialBedLocation);
+        }
+        Component listMessage = createHomesListMessage(playerHomes, bedHome);
         player.sendMessage(listMessage);
         return true;
     }
 
-    private Component createHomesListMessage(List<Home> homesList) {
+    private Component createHomesListMessage(List<Home> homesList, Home bedHome) {
         Component messageToSend = miniMessage.deserialize(LocaleHandler.getInstance().getListHeader());
         if (homesList.isEmpty()) {
             messageToSend = messageToSend
@@ -49,7 +56,12 @@ public class HomeList implements CommandExecutor {
         for (Home home : homesList) {
             messageToSend = messageToSend
                     .appendNewline()
-                    .append(LocaleHandler.getInstance().locationResolver(home, LocaleHandler.getInstance().getListItem()));
+                    .append(LocaleHandler.getInstance().homeComponent(home, LocaleHandler.getInstance().getListItem()));
+        }
+        if (bedHome != null) {
+            messageToSend = messageToSend
+                    .appendNewline()
+                    .append(LocaleHandler.getInstance().bedHomeComponent(bedHome, LocaleHandler.getInstance().getListItem()));
         }
         return messageToSend;
     }

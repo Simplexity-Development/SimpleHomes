@@ -22,7 +22,7 @@ public class CommandUtils {
 
     public static Home getHomeFromList(List<Home> homes, String homeName) {
         for (Home home : homes) {
-            if (home.name().equalsIgnoreCase(homeName)) {
+            if (home.name().equals(homeName)) {
                 return home;
             }
         }
@@ -41,7 +41,6 @@ public class CommandUtils {
         int maxHomes = 0;
         for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
             String permission = pai.getPermission();
-            if (!pai.getValue()) continue; //if the permission is set false, skip it
             if (!pai.getValue() || !permission.startsWith(COUNT_BASE))
                 continue; // if the permission is set false, if it isn't ours, skip it
             permission = permission.replace(COUNT_BASE, ""); //
