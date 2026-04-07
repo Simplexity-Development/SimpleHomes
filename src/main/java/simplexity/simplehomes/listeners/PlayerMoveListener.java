@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitTask;
 import simplexity.simplehomes.commands.HomeCommand;
 import simplexity.simplehomes.configs.ConfigHandler;
 import simplexity.simplehomes.configs.LocaleHandler;
+import simplexity.simplehomes.configs.LocaleMessage;
 
 public class PlayerMoveListener implements Listener {
     @EventHandler
@@ -18,7 +19,7 @@ public class PlayerMoveListener implements Listener {
         Location originalLocation = HomeCommand.teleportRequests.get(player);
         if (originalLocation == null) return;
         if (originalLocation.distance(player.getLocation()) < ConfigHandler.getInstance().getBufferMovement()) return;
-        player.sendRichMessage(LocaleHandler.getInstance().getYouMoved());
+        player.sendRichMessage(LocaleMessage.YOU_MOVED.getMessage());
         HomeCommand.teleportRequests.remove(player);
         BukkitTask task = HomeCommand.teleportTasks.get(player);
         task.cancel();

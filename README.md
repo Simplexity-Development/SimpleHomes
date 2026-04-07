@@ -5,30 +5,65 @@ provides a straightforward interface for home management commands.
 
 ## Commands
 
-| Command        | Permission               | Description         |
-|----------------|--------------------------|---------------------|
-| `/sethome`     | `homes.commands.sethome` | Sets a home         |
-| `/delhome`     | `homes.commands.delhome` | Deletes a home      |
-| `/home`        | `homes.commands.home`    | Teleports to a home |
-| `/homesreload` | `homes.reload`           | Reloads the config  |
-| `/homelist`    | `homes.commands.list`    | Lists your homes    |
+| Command               | Permission         | Description                        |
+|-----------------------|--------------------|------------------------------------|
+| `/sethome`            | `homes.sethome`    | Sets a home                        |
+| `/delhome`            | `homes.delhome`    | Deletes a home                     |
+| `/home`               | `homes.home`       | Teleports to a home                |
+| `/homes`              | `homes.list`       | Lists your homes                   |
+| `/homes admin reload` | `homes.reload`     | Reloads the config                 |
+| `/homes admin tp`     | `homes.admin.tp`   | Teleports to another player's home |
+| `/homes admin list`   | `homes.admin.list` | Lists another player's homes       |
 
 ## Permissions
 
-| Permission               | Default | Description                                                                      |
-|--------------------------|---------|----------------------------------------------------------------------------------|
-| `homes`                  | op      | Allows base plugin functionality                                                 |
-| `homes.commands`         | op      | Allows player to use commands                                                    |
-| `homes.commands.sethome` | op      | Allows player to set home                                                        |
-| `homes.commands.delhome` | op      | Allows player to delete home                                                     |
-| `homes.commands.home`    | op      | Allows player to teleport to home                                                |
-| `homes.commands.list`    | op      | Allows you to list your own homes                                                |
-| `homes.bed`              | op      | Allows you to teleport to your bed                                               |
-| `homes.count`            | op      | Base for permission on number of homes you can have                              |
-| `homes.count.<num>`      | op      | Base for permission on number of homes you can have                              |
-| `homes.count.bypass`     | op      | Allows for setting infinite homes regardless of how many you have set as the max |
-| `homes.reload`           | op      | Allows reloading the config                                                      |
-| `homes.safety.bypass`    | false   | Allows bypassing the safety checks                                               |
+| Permission            | Default | Description                                                                      |
+|-----------------------|---------|----------------------------------------------------------------------------------|
+| `homes.sethome`       | true    | Allows player to set home                                                        |
+| `homes.delhome`       | true    | Allows player to delete home                                                     |
+| `homes.home`          | true    | Allows player to teleport to home                                                |
+| `homes.list`          | true    | Allows you to list your own homes                                                |
+| `homes.bed`           | true    | Allows you to teleport to your bed, requires configuration setting               |
+| `homes.reload`        | op      | Allows reloading the config                                                      |
+| `homes.bypass.safety` | false   | Allows bypassing the safety checks                                               |
+| `homes.bypass.delay`  | op      | Allows bypassing the teleport delay                                              |
+| `homes.bypass.count`  | op      | Allows for setting infinite homes regardless of how many you have set as the max |
+
+## Configuring Number of Homes
+
+The number of homes is determined by permission nodes you create within the `config.yml`.
+
+```yml
+# Configuration for number of homes based on permission
+counts:
+  player:
+    permission: "homes.count.player"
+    home-count: 3
+  moderator:
+    permission: "homes.count.mod"
+    home-count: 5
+```
+
+In the above example, we can break down the counts part of the configuration into a few parts:
+
+```yml
+counts:
+  name:
+    permission: "string"
+    home-count: int
+```
+
+`name` can be anything, just has to be unique.
+
+`permission` can be any string, just has to be unique across all plugins.
+
+- We recommend using `homes.count.<something>`.
+- This is the permission you will give to a player or group/rank.
+
+`home-count` should be an integer, the number of homes you want it to be for the player.
+
+- The highest home-count value given to a player will be applied. This means in the above example,
+  if a player has both then it will apply a maximum of 5 homes.
 
 ## Importing from other plugins
 

@@ -59,6 +59,6 @@ public final class SimpleHomes extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveConfig();
         ConfigHandler.getInstance().loadConfigValues();
-        LocaleHandler.getInstance().loadLocale();
+        LocaleHandler.getInstance().reloadLocale();
     }
 }
